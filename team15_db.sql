@@ -1,4 +1,9 @@
-//Database schema PittTours
+/* Database schema PittTours */
+
+/*
+NOTES:
+I just built all the classes, we still need to set all the constraints and triggers
+*/
 
 drop table AIRLINE cascade constraints;
 drop table FLIGHT cascade constraints;
