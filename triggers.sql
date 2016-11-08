@@ -1,3 +1,7 @@
+/* Trigger 1 */
+
+/* Trigger 2 */
+
 create or replace procedure count_flight(in number varchar(3), out a_count integer)
 AS
 BEGIN
@@ -33,3 +37,9 @@ UPDATE flight
 set flight_type = (select MAX(flight_type) from PLANE)
 end;
 /
+
+/* Trigger 3 */
+     
+/*Extra Trigger */
+     
+     
