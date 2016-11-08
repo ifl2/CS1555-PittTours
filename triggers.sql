@@ -1,5 +1,19 @@
 /* Trigger 1 */
 
+create trigger adjustTicket
+after update of low_price
+on PRICE
+for each row
+when( EXISTS( 	SELECT  cid, ticketed
+		FROM RESERVATION
+		GROUP BY cid
+		HAVING ticketed = 'N')
+BEGIN
+UPDATE DETAIL
+SET cost = :new.low_price
+where 
+END;
+/
 /* Trigger 2 */
 
 create or replace procedure count_flight(in number varchar(3), out a_count integer)
