@@ -2,13 +2,8 @@
 
 /* Constraint Comments:
   All primary and foreign keys are set not null.
-
   All foreign keys that reference an airline will cascade on delete if the airline no longer exists.
-  Being that people can't fly without an airline, deleting all connected to them makes sense.
-  
-  If a plane is deleted, it will cascade to set null, for a new plane could be assigned.
-  
-  If a flight number is deleted, it will cascade to set null, for a new flight could be taken for the reservation leg.
+    Being that people can't fly without an airline, deleting all connected to them makes sense.
 */
 
 -- DROP TABLES
@@ -22,7 +17,7 @@ drop table DETAIL cascade constraints;
 drop table TIME cascade constraints;
 
 -- CREATE TABLES
--- Every airline should have a name (not null)
+-- Every airline must have a name (not null)
 create table AIRLINE(
 airline_id varchar(5) not null,
 airline_name varchar(5) not null,
@@ -30,17 +25,19 @@ airline_abbreviation varchar(10),
 year_founded int,
 constraint pk_airline primary key(airline_id));
 
+-- Every plane must have a listed capacity, otherwise its entry has no value (not null)
 create table PLANE(
 plane_type char(4) not null,
 manufacture varchar(10),
-plane_capacity int,
+plane_capacity int not null,
 last_service date,
 year int,
 owner_id varchar(5) not null,
 constraint pk_plane primary key(plane_type),
 constraint fk_plane foreign key(owner_id) references AIRLINE(airline_id) on delete cascade);
 
--- Every flight should have a depearture and arrival city (not null) 
+-- Every flight must have a depearture and arrival city (not null)
+-- Plane deletion set null, flight can get a different plane
 create table FLIGHT(
 flight_number varchar(3) not null,
 airline_id varchar(5) not null,
@@ -92,6 +89,8 @@ ticketed varchar(1),
 constraint pk_reservation primary key(reservation_number),
 constraint fk_reservation foreign key(cid) references CUSTOMER(cid) on delete cascade);
 
+-- Flight deletion will set null insteadd of deleting leg, for a new flight can be found
+-- (otherwise a passenger's trip has just ended, no matter their location)
 create table DETAIL(
 reservation_number varchar(5) not null,
 flight_number varchar(3),
