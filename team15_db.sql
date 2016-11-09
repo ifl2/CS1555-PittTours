@@ -92,13 +92,11 @@ ticketed varchar(1),
 constraint pk_reservation primary key(reservation_number),
 constraint fk_reservation foreign key(cid) references CUSTOMER(cid) on delete cascade);
 
--- Added cost column, required for triggers that need the cost of a leg
 create table DETAIL(
 reservation_number varchar(5) not null,
 flight_number varchar(3),
 flight_date date,
 leg int not null,
-cost int,
 constraint pk_detail primary key(reservation_number, leg),
 constraint fk_detail1 foreign key(reservation_number) references RESERVATION(reservation_number) on delete cascade,
 constraint fk_detail2 foreign key(flight_number) references FLIGHT(flight_number) on delete set null);
