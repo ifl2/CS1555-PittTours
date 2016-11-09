@@ -9,11 +9,19 @@ when( EXISTS( 	SELECT  cid, ticketed
 		GROUP BY cid
 		HAVING ticketed = 'N')
 BEGIN
-UPDATE DETAIL
-SET cost = :new.low_price
-where 
+UPDATE DETAIL D
+SET D.cost = P.low_price
+where (D.flight_number = (SELECT F.flight_number
+       		        FROM FLIGHT F NATURAL JOIN PRICE P
+		       	WHERE)
 END;
 /
+create or replace trigger update_reservation
+after update of cost
+on DETAIL
+for each row
+BEGIN
+       
 /* Trigger 2 */
 
 create or replace procedure count_flight(in number varchar(3), out a_count integer)
