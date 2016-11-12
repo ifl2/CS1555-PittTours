@@ -60,9 +60,9 @@ for each row
 begin
 select flight_number
 from DETAIL D
-where D.reservation_number= :new.reservation_number
+where D.flight_number= :new.flight_number
 
-declare count =  count_flight(flight_number)
+declare count =  count_flight(D.flight_number)
 when(EXISTS( is_full(flight_number,count))
 UPDATE flight
 set flight_type = (select MAX(flight_type) from PLANE)
