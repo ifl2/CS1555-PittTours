@@ -64,8 +64,19 @@ where D.flight_number= :new.flight_number
 
 declare count =  count_flight(D.flight_number)
 when(EXISTS( is_full(flight_number,count))
+select MAX(plane_capacity) into max_capacity
+from plane
+if max_capacity = count then
+return;
+else
 UPDATE flight
-set flight_type = (select MAX(flight_type) from PLANE)
+set flight_type = (select flight_type
+		   from PLANE
+		   where flight_capacity >= count
+	   	   order by flight_capacity ASC
+		   fetch first row only;)
+where flight_number=D.flight_number;
+END IF;
 end;
 /
 
