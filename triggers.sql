@@ -13,23 +13,25 @@ create trigger adjustTicket
 after update of low_price
 on PRICE
 for each row
+
+select R2.reservation_num, SUM(R2.cost) into new_cost
+from (((FLIGHT natural join PRICE) natural join DETAIL) natural join RESERVATION R2)
+group by reservation_number
+where D1.reservation_number IN (select D2.reservation_number
+from (PRICE P2 natural join FLIGHT F2) inner join DETAIL D2 on F2.flight_number=D2.flight_number) 
+where P2.departure_city=:new.departure_city and P2.arrival_city=:new.arrival_city)
+
 when( EXISTS( 	SELECT  cid, ticketed
 		FROM RESERVATION
 		GROUP BY cid
 		HAVING ticketed = 'N')
 BEGIN
-UPDATE DETAIL D
-SET D.cost = P.low_price
-where (D.flight_number = (SELECT F.flight_number
-       		        FROM FLIGHT F NATURAL JOIN PRICE P
-		       	WHERE)
+UPDATE RESERVATION R
+SET R.cost = new_cost
+where R.reservation_number = R1.reservation_number
 END;
 /
-create or replace trigger update_reservation
-after update of cost
-on DETAIL
-for each row
-BEGIN
+
        
 /* Trigger 2 */
 
