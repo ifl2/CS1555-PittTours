@@ -119,5 +119,14 @@ order by flight_capacity DESC
 fetch fisrt row only;)
 end;
 /
+						  
+						  
+						  
+/*Trigger extra*/
+						  
+create trigger ten_percent				 
+after insert of low_price
+on PRICE
+for each row
 
      
