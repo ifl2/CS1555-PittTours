@@ -108,7 +108,7 @@ where ticketed = 'N' AND R.reservation_number IN (select D.reservation_number
 from FLIGHT natural join DETAIL
 where D.flight_number IN (select flight_number 
 from FLIGHT natural join RESERVATION
-where (reservation_date <= c_date) // somehow add 12h)
+where (reservation_date <= dateadd(HOUR, 12, c_date) // add 12h)
 
 declare count = count_flight(D.flight_number)
 UPDATE FLIGHT
