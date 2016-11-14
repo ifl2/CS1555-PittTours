@@ -94,6 +94,25 @@ plane, then the plane for that flight should be switched to the smaller-capacity
 5. if ticketed = 'Y' count all the tickets for each flight
 6. use the count to find a smaller plane if possible( select plane_type from PLANE where plane_capacity >= count , sort by min first)
 7. if find a smaller plane, update FLIGHT(where F.plane_type = P.plane_type)
-/*Extra Trigger */
      
+DELETE FROM RESERVATION
+where reservation_number IN (select R.reservation_number
+group by R.reservation_number
+from RESERVATION
+where ticketed = 'N' AND R.reservation_number IN (select D.reservation_number
+from FLIGHT natural join DETAIL
+where D.flight_number IN (select flight_number 
+from FLIGHT natural join RESERVATION
+where (reservation_date <= c_date) // somehow add 12h)
+
+declare count = count_flight(D.flight_number)
+UPDATE FLIGHT
+set flight_type =(select plane_type
+from PLANE
+where plane_capacity >= count
+order by flight_capacity DESC
+fetch fisrt row only;)
+end;
+/
+
      
