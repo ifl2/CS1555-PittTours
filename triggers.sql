@@ -116,17 +116,22 @@ set flight_type =(select plane_type
 from PLANE
 where plane_capacity >= count
 order by flight_capacity DESC
-fetch fisrt row only;)
+fetch first row only;)
 end;
 /
 						  
 						  
 						  
 /*Trigger extra*/
-						  
-create trigger ten_percent				 
-after insert of low_price
-on PRICE
+create trigger ten_percent
+after insert of reservation_number
+on RESERVATION
 for each row
 
+update reservation
+set cost=cost*0.9
+where cid = (select cid from customer
+where frequent_miles != null)
+
+end;
      
