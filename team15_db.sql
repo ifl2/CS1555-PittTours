@@ -17,7 +17,7 @@ drop table DETAIL cascade constraints;
 drop table TIME cascade constraints;
 
 -- CREATE TABLES
--- Every airline must have a name (not null)
+-- Not Null: Every airline must have a name
 create table AIRLINE(
 airline_id varchar(5) not null,
 airline_name varchar(50) not null,
@@ -25,7 +25,7 @@ airline_abbreviation varchar(10),
 year_founded int,
 constraint pk_airline primary key(airline_id));
 
--- Every plane must have a listed capacity, otherwise its entry has no value (not null)
+-- Not Null: Every plane must have a listed capacity, otherwise its entry has no value
 create table PLANE(
 plane_type char(4) not null,
 manufacture varchar(10),
@@ -36,8 +36,9 @@ owner_id varchar(5) not null,
 constraint pk_plane primary key(plane_type),
 constraint fk_plane foreign key(owner_id) references AIRLINE(airline_id) on delete cascade);
 
--- Every flight must have a depearture and arrival city (not null)
+-- Not Null: Every flight must have a depearture city and arrival city
 -- Plane deletion set null, flight can get a different plane
+-- Check: Must depeart before we arrive
 create table FLIGHT(
 flight_number varchar(3) not null,
 airline_id varchar(5) not null,
@@ -49,8 +50,10 @@ arrival_time varchar(4),
 weekly_schedule varchar(7),
 constraint pk_flight primary key(flight_number),
 constraint fk_flight1 foreign key(plane_type) references PLANE(plane_type) on delete set null,
-constraint fk_flight2 foreign key(airline_id) references AIRLINE(airline_id) on delete cascade);
+constraint fk_flight2 foreign key(airline_id) references AIRLINE(airline_id) on delete cascade,
+constraint ch_time check(departure_time < arrival_time));
 
+-- Check: Low price must not be higher than high price
 create table PRICE(
 departure_city varchar(3) not null,
 arrival_city varchar(3) not null,
@@ -58,10 +61,11 @@ airline_id varchar(5) not null,
 high_price int,
 low_price int,
 constraint pk_price primary key(departure_city, arrival_city),
-constraint fk_price foreign key(airline_id) references AIRLINE(airline_id) on delete cascade);
+constraint fk_price foreign key(airline_id) references AIRLINE(airline_id) on delete cascade),
+constraint ch_price check(high_price >= low_price));
 
 -- Customer table has some inconsistence in the project description, the schema does not match the description of the datatype
--- Assuming salutation is not null, since it is 'one of three values' (checked)
+-- Check: Assuming salutation is not null, since it is 'one of three values'
 -- Customers have a first and last name (not null)
 create table CUSTOMER(
 cid varchar(9) not null,
@@ -77,8 +81,9 @@ phone varchar(10),
 email varchar(30),
 frequent_miles varchar(5),
 constraint pk_customer primary key(cid),
-constraint chk_salutation check (salutation='Mr' OR salutation='Mrs' OR salutation='Ms'));
+constraint ch_salutation check(salutation='Mr' OR salutation='Mrs' OR salutation='Ms'));
 
+-- Customer deletion cascade, if customer is removed, his reservations should be as well
 create table RESERVATION(
 reservation_number varchar(5) not null,
 cid varchar(9) not null,
@@ -89,7 +94,7 @@ ticketed varchar(1),
 constraint pk_reservation primary key(reservation_number),
 constraint fk_reservation foreign key(cid) references CUSTOMER(cid) on delete cascade);
 
--- Flight deletion will set null insteadd of deleting leg, for a new flight can be found
+-- Flight deletion will set null instead of deleting leg, for a new flight can be found
 -- (otherwise a passenger's trip has just ended, no matter their location)
 create table DETAIL(
 reservation_number varchar(5) not null,
