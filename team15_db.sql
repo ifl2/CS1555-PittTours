@@ -20,7 +20,7 @@ drop table TIME cascade constraints;
 -- Every airline must have a name (not null)
 create table AIRLINE(
 airline_id varchar(5) not null,
-airline_name varchar(5) not null,
+airline_name varchar(50) not null,
 airline_abbreviation varchar(10),
 year_founded int,
 constraint pk_airline primary key(airline_id));
