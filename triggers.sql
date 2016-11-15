@@ -28,7 +28,8 @@ when( EXISTS( 	SELECT  cid, ticketed
 BEGIN
 UPDATE RESERVATION R
 SET R.cost = new_cost
-where R.reservation_number = R1.reservation_number
+where R.reservation_number = R1.reservation_number AND 'N' = (select ticketed from RESERVATION R1
+where R1.reservation_num = R2.reservation_number)
 END;
 /
 
@@ -103,7 +104,7 @@ for each row
 DELETE FROM RESERVATION
 where reservation_number IN (select R.reservation_number
 group by R.reservation_number
-from RESERVATION
+from RESERVATION R
 where ticketed = 'N' AND R.reservation_number IN (select D.reservation_number
 from FLIGHT natural join DETAIL
 where D.flight_number IN (select flight_number 
