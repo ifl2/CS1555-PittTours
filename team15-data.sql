@@ -1,42 +1,33 @@
 -- Generate the data to represent at least 200 users, 300 reservations, 10 airlines, 30 planes and 100 flights.
+-- (plus 100 prices to match 100 flights and 1-4 legs for each reservation)
 
-/*
-10 AIRLINES
-Airline(airline id, airline name, airline abbreviation, year founded)
+/* 10 AIRLINES
+Airline(airline_id, airline_name, airline_abbreviation, year_founded)
+	airline_id varchar(5) = generated sequentially starting at 001
+	airline_name varchar(50) = generated sequentially starting at Airline001
+	airline_abbreviation varchar(10) = generated as (A + airline_id)
+	year_founded int = generated as sequential decades starting at 1900 */
 
-airline id, varchar(5) = generated sequentially starting at 001
-airline name varchar(50) = generated sequentially starting at Airline001
-airline abbreviation varchar(10) = generated sequentially starting at AAA
-year founded int = generated as sequential decades starting at 1900
-
-Here are example tuples:
-001 United Airlines UAL 1931 */
-
-insert into airline values('001', 'Airline001', 'AAA', 1900);
-insert into airline values('002', 'Airline002', 'AAB', 1910);
-insert into airline values('003', 'Airline003', 'AAC', 1920);
-insert into airline values('004', 'Airline004', 'AAD', 1930);
-insert into airline values('005', 'Airline005', 'AAE', 1940);
-insert into airline values('006', 'Airline006', 'AAF', 1950);
-insert into airline values('007', 'Airline007', 'AAG', 1960);
-insert into airline values('008', 'Airline008', 'AAH', 1970);
-insert into airline values('009', 'Airline009', 'AAI', 1980);
-insert into airline values('010', 'Airline010', 'AAJ', 1990);
+insert into airline values('001', 'Airline001', 'A001', 1900);
+insert into airline values('002', 'Airline002', 'A002', 1910);
+insert into airline values('003', 'Airline003', 'A003', 1920);
+insert into airline values('004', 'Airline004', 'A004', 1930);
+insert into airline values('005', 'Airline005', 'A005', 1940);
+insert into airline values('006', 'Airline006', 'A006', 1950);
+insert into airline values('007', 'Airline007', 'A007', 1960);
+insert into airline values('008', 'Airline008', 'A008', 1970);
+insert into airline values('009', 'Airline009', 'A009', 1980);
+insert into airline values('010', 'Airline010', 'A010', 1990);
 
 
-/*
-30 PLANES
-Plane(plane type, manufacture, plane capacity, last service date, year, owner id)
-
-plane type char(4) = generated manually (format is manufacturer+capacity)
-manufacture varchar(10) = generated manually (M_ + manufacturer)
-plane capacity int = generated manually based on plane type
-last service date = generated randomly (01/01/2010 to 12/31/2015)
-year int = generated randomly (1950 to 2000)
-owner id varchar(5) -> airlines.airlineid = generated randomly from airline_id
-
-Here are example tuples:
-B737 Boeing 125 09/09/2009 1996 001 */
+/* 30 PLANES
+Plane(plane_type, manufacture, plane_capacity, last_service_date, year, owner_id)
+	plane_type char(4) = generated manually (manufacturer+capacity)
+	manufacture varchar(10) = generated manually (M_ + manufacturer)
+	plane_capacity int = based on plane_type
+	last_service_date date = generated randomly (01/01/2010 to 12/31/2015)
+	year int = generated randomly (1950 to 2000)
+	owner_id varchar(5) -> airlines.airlineid = generated randomly from airline_id */
 
 insert into plane values('A100', 'M_A', 100, to_date('02/17/2010', 'MM/DD/YYYY'), 1987, '010');
 insert into plane values('A150', 'M_A', 150, to_date('07/12/2010', 'MM/DD/YYYY'), 1978, '009');
@@ -70,21 +61,16 @@ insert into plane values('D300', 'M_D', 300, to_date('10/20/2013', 'MM/DD/YYYY')
 insert into plane values('D400', 'M_D', 400, to_date('02/14/2015', 'MM/DD/YYYY'), 1984, '004');
 
 
-/*
-100 FLIGHTS
-Flight(flight number, airline id, plane type, departure city, arrival city,departure time, arrival time, weekly schedule)
-
-flight number varchar(3) = generated sequentially starting at 001
-airline id, varchar(5) -> plane.ownerid = matches planes
-plane type char(4) -> plane.planetype = generated randomly from planes
-departure city varchar(3) -> 3 letter airport code = generated randomly from the top 20 busiest US airports
-arrival city varchar(3) -> 3 letter airport code = generated randomly from the top 20 busiest US airports (with different arrival from departure)
-departure time varchar(4) -> 0000 to 2359 = generated randomly (000 to 235), append 0
-arrival time varchar(4) = generated randomly (000 to 235), append 0
-weekly schedule varchar(7) = generated randomly with 25% chance of each day being a -
-
-Here are example tuples:
-153 001 A320 PIT JFK 1000 1120 SMTWTFS */
+/* 100 FLIGHTS
+Flight(flight_number, airline_id, plane_type, departure_city, arrival_city, departure_time, arrival_time, weekly_schedule)
+	flight_number varchar(3) = generated sequentially starting at 001
+	airline_id, varchar(5) -> plane.ownerid = matches planes
+	plane_type char(4) -> plane.planetype = generated randomly from planes
+	departure_city varchar(3) -> 3 letter airport code = generated randomly from the top 20 busiest US airports
+	arrival_city varchar(3) -> 3 letter airport code = generated randomly from the top 20 busiest US airports (with different arrival from departure)
+	departure_time varchar(4) -> 0000 to 2359 = generated randomly (000 to 235), append 0
+	arrival_time varchar(4) -> 0000 to 2359 = generated randomly (000 to 235), append 0
+	weekly_schedule varchar(7) = generated randomly with 25% chance of each day being a - */
 
 insert into flight values('000', '003', 'A250', 'LAX', 'LAS', '0590', '2220', '--TWTFS');
 insert into flight values('001', '007', 'A300', 'PHX', 'SEA', '1800', '1670', '--TW--S');
@@ -188,17 +174,13 @@ insert into flight values('098', '004', 'B222', 'ATL', 'PHX', '0680', '0730', 'S
 insert into flight values('099', '007', 'B100', 'DEN', 'ORD', '1980', '2280', '-MT--FS');
 
 
-/*
-Price(departure city, arrival city, airline id, high price, low price)
-
-departure city varchar(3) = copied from flights
-arrival city varchar(3) = copied from flights
-airline id -> Airline.airline id = copied from flights
-high price int = generated randomly (200 to 300)
-low price int = generated randomly (100 to 199)
-
-Here are example tuples:
-PIT JFK 001 250 120 */
+/* 100 PRICES
+Price(departure_city, arrival_city, airline_id, high_price, low_price)
+	departure_city varchar(3) = copied from flights
+	arrival_city varchar(3) = copied from flights
+	airline_id -> Airline.airline id = copied from flights
+	high_price_int = generated randomly (200 to 300)
+	low_price_int = generated randomly (100 to 199) */
 
 insert into price values('LAX', 'LAS', '009', 243, 178);
 insert into price values('PHX', 'SEA', '006', 233, 189);
@@ -302,22 +284,20 @@ insert into price values('ATL', 'PHX', '007', 290, 184);
 insert into price values('DEN', 'ORD', '010', 292, 175);
 
 
-/*
-200 USERS
-Customer(cid, salutation, first name, last name, credit card num, street, credit card expire, city, state, phone, email)
-
-cid varchar(9) = generated randomly as unique values of length=9
-salutation varchar(3) -> Mr, Mrs, Ms = females generated randomly between Mrs and Ms, males set to Mr
-first name varchar(30) = generated randomly, 100 males and 100 females
-last name varchar(30) = generated randomly
-credit card num varchar(16) = generated randomly as unique values of length=16
-credit card expire date = generated randomly (01/2016 to 12/2020)
-street varchar(30) = generated as street + first 2 digits of cid
-city varchar(30) = generated randomly from the top 50 US cities by population
-state varchar(2) = matches state of city
-phone varchar(10) = generated randomly of length=7, prefix by 555
-email varchar(30) = generated as first 2 letters of first name + first 2 letters of last name + last 2 digits of cid + @gmail.com
-frequent miles varchar(5) -> null or airline id = generated randomly from airlines (001 to 010) with 50% chance of null */
+/* 200 USERS
+Customer(cid, salutation, first_name, last_name, credit_card_num, street, credit_card_expire, city, state, phone, email, frequent_miles)
+	cid varchar(9) = generated randomly as unique values of length=9
+	salutation varchar(3) -> Mr, Mrs, Ms = females generated randomly between Mrs and Ms, males set to Mr
+	first_name varchar(30) = generated randomly, 100 males and 100 females
+	last_name varchar(30) = generated randomly
+	credit_card_num varchar(16) = generated randomly as unique values of length=16
+	credit_card_expire date = generated randomly (01/2016 to 12/2020)
+	street varchar(30) = generated as street + first 2 digits of cid
+	city varchar(30) = generated randomly from the top 50 US cities by population
+	state varchar(2) = matches state of city
+	phone varchar(10) = generated randomly of length=7, prefix by 555
+	email varchar(30) = generated as first 2 letters of first name + first 2 letters of last name + last 2 digits of cid + @email.com
+	frequent_miles varchar(5) -> null or airline id = generated randomly from airlines (001 to 010) with 50% chance of null */
 
 insert into customer values('572723715',  'Mr', 'Theron',     'Broadwa',     '4297678776294822', to_date('07/2016', 'MM/YYYY'), 'Street57', 'Omaha',            'NE', '5555816834', 'ThBr15@email.com', 'null');
 insert into customer values('047686725',  'Mr', 'Trinidad',   'Fasano',      '5404510461415169', to_date('05/2018', 'MM/YYYY'), 'Street04', 'Atlanta',          'GA', '5553673646', 'TrFa25@email.com', 'null');
@@ -521,28 +501,16 @@ insert into customer values('123456789',  'Ms', 'Nettie',     'Twitchell',   '70
 insert into customer values('987654321',  'Ms', 'Bill',       'Bob',         '5138465813536888', to_date('10/2019', 'MM/YYYY'), 'Street98', 'Long Beach',       'CA', '5556462254', 'BiBo21@email.com', '007' );
 
 
-/*
-300 RESERVATIONS
-Reservation(reservation number, cid, cost, credit card num, reservation date, ticketed)
-
-reservation number varchar(5) = generated sequentially starting at 00000
-cid varchar(9) -> customer.cid = generated randomly from cid
-cost int = NEEDS FIXED
-credit card num varchar(16) = generated to match cid
-reservation date date = generated randomly (01/01/2015 to 12/31/2015) NEED TIME ADDED
-start_city varchar(3) = NEEDS ADDED
-end_city varchar(3) = NEEDS ADDED
-ticketed varchar(1) -> Y/N = generated randomly, 10% chance of N
-
-
-Reservation detail(reservation number, flight number, flight date, leg)
-//one way or round trip, 0 or 1 connections for each direction (1-2 legs direct, 2-4 legs round trip)
-reservation number varchar(5) -> reservation.reservation_number
-flight number varchar(3) -> flight.flight_number
-flight date date
-leg int -> 0, +1 for consecutive legs
-
-*reservation detail contains full trip, including round trip */
+/* 300 RESERVATIONS
+Reservation(reservation_number, cid, cost, credit_card_num, reservation_date, ticketed)
+	reservation_number varchar(5) = generated sequentially starting at 00000
+	cid varchar(9) -> customer.cid = generated randomly from cid
+	cost int = NEEDS ADDED, BASE ON PRICES
+	credit_card_num varchar(16) = matches credit_card_num of cid
+	reservation_date date = generated randomly (01/01/2015 to 12/31/2015) NEED TIME ADDED
+	start_city varchar(3) = NEEDS ADDED
+	end_city varchar(3) = NEEDS ADDED
+	ticketed varchar(1) -> Y/N = generated randomly, 10% chance of N */
 
 insert into reservation values('00000', '744202758', null, '6544878526228429', to_date('12/20/2016', 'MM/DD/YYYY'), '', '', 'Y'); 
 insert into reservation values('00001', '750670965', null, '3740232255497666', to_date('10/27/2015', 'MM/DD/YYYY'), '', '', 'Y'); 
@@ -844,3 +812,15 @@ insert into reservation values('00296', '044815309', null, '4752445326795266', t
 insert into reservation values('00297', '047686725', null, '5404510461415169', to_date('05/07/2016', 'MM/DD/YYYY'), '', '', 'Y'); 
 insert into reservation values('00298', '964999489', null, '9547273870991315', to_date('08/01/2016', 'MM/DD/YYYY'), '', '', 'Y'); 
 insert into reservation values('00299', '361217343', null, '3008311844040642', to_date('05/25/2016', 'MM/DD/YYYY'), '', '', 'Y');
+
+
+/* ### DETAILS
+Detail(reservation_number, flight_number, flight_date, leg)
+	reservation_number varchar(5) -> reservation.reservation_number
+	flight_number varchar(3) -> flight.flight_number
+	flight_date date
+	leg int -> 0, +1 for consecutive legs
+
+*one way or round trip: 0 or 1 connections for each direction (1-2 legs direct, 2-4 legs round trip)
+*reservation detail contains full trip, including round trip */
+
