@@ -29,7 +29,7 @@ insert into airline values('010', 'Airline010', 'AAJ', 1990);
 Plane(plane type, manufacture, plane capacity, last service date, year, owner id)
 
 plane type char(4) = generated manually (format is manufacturer+capacity)
-manufacture varchar(10) = generated manually (M_ +  A to D)
+manufacture varchar(10) = generated manually (M_ + manufacturer)
 plane capacity int = generated manually based on plane type
 last service date = generated randomly (01/01/2010 to 12/31/2015)
 year int = generated randomly (1950 to 2000)
@@ -47,7 +47,7 @@ insert into plane values('A250', 'M_A', 250, to_date('10/25/2010', 'MM/DD/YYYY')
 insert into plane values('A280', 'M_A', 280, to_date('02/17/2011', 'MM/DD/YYYY'), 1977, '002');
 insert into plane values('A290', 'M_A', 290, to_date('07/05/2011', 'MM/DD/YYYY'), 1974, '005');
 insert into plane values('A300', 'M_A', 300, to_date('09/05/2011', 'MM/DD/YYYY'), 1983, '007');
-insert into plane values('A999', 'M_A', 999, to_date('09/29/2011', 'MM/DD/YYYY'), 1988, '003');
+insert into plane values('A350', 'M_A', 350, to_date('09/29/2011', 'MM/DD/YYYY'), 1988, '003');
 insert into plane values('B050', 'M_B',  50, to_date('01/28/2012', 'MM/DD/YYYY'), 1960, '002');
 insert into plane values('B100', 'M_B', 100, to_date('03/21/2012', 'MM/DD/YYYY'), 1968, '007');
 insert into plane values('B120', 'M_B', 120, to_date('11/08/2012', 'MM/DD/YYYY'), 1961, '008');
@@ -57,17 +57,17 @@ insert into plane values('B150', 'M_B', 150, to_date('06/09/2013', 'MM/DD/YYYY')
 insert into plane values('B170', 'M_B', 170, to_date('11/03/2013', 'MM/DD/YYYY'), 1972, '004');
 insert into plane values('B211', 'M_B', 211, to_date('02/11/2014', 'MM/DD/YYYY'), 1996, '003');
 insert into plane values('B222', 'M_B', 222, to_date('08/06/2014', 'MM/DD/YYYY'), 1973, '004');
-insert into plane values('B999', 'M_B', 999, to_date('08/28/2014', 'MM/DD/YYYY'), 1970, '008');
+insert into plane values('B233', 'M_B', 233, to_date('08/28/2014', 'MM/DD/YYYY'), 1970, '008');
 insert into plane values('C020', 'M_C',  20, to_date('10/24/2014', 'MM/DD/YYYY'), 1958, '006');
 insert into plane values('C050', 'M_C',  50, to_date('06/30/2015', 'MM/DD/YYYY'), 1951, '007');
 insert into plane values('C070', 'M_C',  70, to_date('07/12/2015', 'MM/DD/YYYY'), 1965, '007');
 insert into plane values('C090', 'M_C',  90, to_date('09/15/2015', 'MM/DD/YYYY'), 1976, '009');
 insert into plane values('C100', 'M_C', 100, to_date('12/10/2015', 'MM/DD/YYYY'), 1978, '006');
-insert into plane values('C999', 'M_C', 999, to_date('04/08/2010', 'MM/DD/YYYY'), 1951, '002');
+insert into plane values('C133', 'M_C', 133, to_date('04/08/2010', 'MM/DD/YYYY'), 1951, '002');
 insert into plane values('D100', 'M_D', 100, to_date('07/11/2010', 'MM/DD/YYYY'), 1995, '001');
 insert into plane values('D200', 'M_D', 200, to_date('11/20/2012', 'MM/DD/YYYY'), 1951, '002');
 insert into plane values('D300', 'M_D', 300, to_date('10/20/2013', 'MM/DD/YYYY'), 1991, '002');
-insert into plane values('D999', 'M_D', 999, to_date('02/14/2015', 'MM/DD/YYYY'), 1984, '004');
+insert into plane values('D400', 'M_D', 400, to_date('02/14/2015', 'MM/DD/YYYY'), 1984, '004');
 
 
 /*
@@ -186,6 +186,119 @@ insert into flight values('096', '005', 'C100', 'DFW', 'CLT', '2340', '1130', 'S
 insert into flight values('097', '001', 'A280', 'SFO', 'DEN', '0980', '2060', '---WTFS');
 insert into flight values('098', '007', 'B130', 'ATL', 'PHX', '0680', '0730', 'SMTWTFS');
 insert into flight values('099', '010', 'A280', 'DEN', 'ORD', '1980', '2280', '-MT--FS');
+
+/*
+Price(departure city, arrival city, airline id, high price, low price)
+
+departure city varchar(3) = copied from flights
+arrival city varchar(3) = copied from flights
+airline id -> Airline.airline id = copied from flights
+high price int = 
+low price int = 
+
+Here are example tuples:
+PIT JFK 001 250 120 */
+
+insert into price values('LAX', 'LAS', '009', 243, 178);
+insert into price values('PHX', 'SEA', '006', 233, 189);
+insert into price values('MCO', 'ATL', '007', 293, 182);
+insert into price values('CLT', 'MCO', '009', 227, 122);
+insert into price values('DFW', 'MIA', '001', 280, 166);
+insert into price values('JFK', 'LAX', '001', 225, 101);
+insert into price values('LAS', 'MSP', '004', 226, 116);
+insert into price values('MSP', 'PHX', '006', 279, 104);
+insert into price values('SFO', 'LAS', '009', 256, 108);
+insert into price values('IAH', 'LAS', '005', 212, 160);
+insert into price values('BOS', 'DFW', '005', 298, 126);
+insert into price values('DTW', 'BOS', '007', 234, 107);
+insert into price values('MIA', 'SEA', '009', 279, 141);
+insert into price values('PHL', 'DFW', '001', 251, 197);
+insert into price values('SEA', 'MCO', '006', 222, 199);
+insert into price values('ATL', 'LAX', '003', 236, 170);
+insert into price values('LGA', 'CLT', '009', 267, 151);
+insert into price values('EWR', 'IAH', '007', 269, 131);
+insert into price values('DEN', 'MSP', '003', 258, 163);
+insert into price values('ORD', 'DTW', '003', 223, 188);
+insert into price values('MCO', 'MIA', '008', 299, 160);
+insert into price values('BOS', 'EWR', '002', 218, 195);
+insert into price values('ATL', 'SEA', '007', 248, 103);
+insert into price values('SEA', 'IAH', '008', 215, 172);
+insert into price values('IAH', 'MIA', '010', 222, 197);
+insert into price values('CLT', 'PHX', '005', 202, 133);
+insert into price values('LAS', 'DEN', '003', 209, 187);
+insert into price values('PHX', 'MCO', '003', 237, 140);
+insert into price values('LGA', 'PHL', '009', 251, 139);
+insert into price values('MIA', 'SFO', '002', 243, 194);
+insert into price values('JFK', 'BOS', '008', 250, 172);
+insert into price values('DTW', 'LGA', '005', 242, 197);
+insert into price values('MSP', 'DEN', '008', 288, 181);
+insert into price values('DFW', 'PHL', '010', 283, 185);
+insert into price values('EWR', 'ATL', '007', 202, 102);
+insert into price values('SFO', 'EWR', '006', 225, 113);
+insert into price values('LAX', 'SFO', '006', 259, 131);
+insert into price values('PHL', 'MSP', '002', 227, 128);
+insert into price values('ORD', 'CLT', '010', 295, 144);
+insert into price values('DEN', 'PHL', '009', 281, 131);
+insert into price values('SFO', 'JFK', '010', 209, 198);
+insert into price values('EWR', 'CLT', '007', 237, 145);
+insert into price values('IAH', 'DTW', '004', 284, 144);
+insert into price values('JFK', 'DTW', '009', 219, 130);
+insert into price values('ATL', 'PHL', '008', 285, 191);
+insert into price values('ORD', 'MSP', '003', 275, 112);
+insert into price values('SEA', 'DTW', '006', 226, 107);
+insert into price values('MSP', 'ATL', '002', 277, 185);
+insert into price values('PHL', 'LGA', '008', 277, 178);
+insert into price values('DTW', 'JFK', '004', 203, 139);
+insert into price values('DEN', 'ATL', '010', 254, 100);
+insert into price values('BOS', 'IAH', '010', 266, 133);
+insert into price values('LAX', 'SEA', '008', 243, 174);
+insert into price values('LAS', 'SFO', '005', 273, 161);
+insert into price values('LGA', 'SFO', '005', 236, 119);
+insert into price values('MIA', 'JFK', '004', 274, 107);
+insert into price values('CLT', 'EWR', '010', 216, 162);
+insert into price values('DFW', 'LAX', '003', 221, 109);
+insert into price values('PHX', 'SFO', '008', 246, 144);
+insert into price values('MCO', 'EWR', '001', 213, 160);
+insert into price values('EWR', 'DFW', '010', 203, 171);
+insert into price values('LGA', 'SEA', '003', 288, 146);
+insert into price values('ATL', 'DFW', '009', 294, 123);
+insert into price values('DEN', 'LGA', '010', 209, 170);
+insert into price values('CLT', 'ORD', '001', 218, 156);
+insert into price values('MCO', 'BOS', '002', 212, 157);
+insert into price values('LAS', 'LGA', '008', 240, 121);
+insert into price values('MSP', 'DFW', '007', 202, 167);
+insert into price values('LAX', 'MIA', '008', 222, 117);
+insert into price values('DTW', 'LAS', '009', 242, 198);
+insert into price values('SEA', 'BOS', '007', 286, 170);
+insert into price values('PHX', 'LAX', '004', 250, 166);
+insert into price values('DFW', 'IAH', '005', 224, 153);
+insert into price values('BOS', 'EQR', '006', 235, 128);
+insert into price values('MIA', 'DTW', '004', 251, 157);
+insert into price values('JFK', 'DEN', '007', 300, 191);
+insert into price values('IAH', 'JFK', '004', 254, 165);
+insert into price values('ORD', 'JFK', '007', 249, 161);
+insert into price values('PHL', 'LAX', '008', 275, 176);
+insert into price values('SFO', 'LGA', '002', 280, 106);
+insert into price values('CLT', 'ATL', '003', 287, 134);
+insert into price values('JFK', 'LAS', '008', 258, 184);
+insert into price values('LAX', 'DEN', '009', 280, 147);
+insert into price values('SEA', 'PHX', '006', 248, 149);
+insert into price values('MSP', 'ORD', '007', 284, 125);
+insert into price values('IAH', 'MCO', '003', 243, 131);
+insert into price values('LGA', 'MIA', '003', 252, 119);
+insert into price values('LAS', 'ORD', '003', 201, 165);
+insert into price values('BOS', 'CLT', '005', 252, 136);
+insert into price values('MCO', 'ORD', '006', 241, 185);
+insert into price values('MIA', 'PHX', '010', 209, 195);
+insert into price values('PHL', 'BOS', '008', 212, 120);
+insert into price values('EWR', 'MCO', '009', 230, 191);
+insert into price values('PHX', 'CLT', '008', 223, 111);
+insert into price values('DTW', 'IAH', '005', 295, 116);
+insert into price values('ORD', 'PHL', '004', 279, 183);
+insert into price values('DFW', 'MSP', '005', 241, 157);
+insert into price values('SFO', 'DEN', '001', 225, 155);
+insert into price values('ATL', 'PHX', '007', 290, 184);
+insert into price values('DEN', 'ORD', '010', 292, 175);
 
 
 /*
