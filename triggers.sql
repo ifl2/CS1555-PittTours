@@ -49,7 +49,7 @@ end;
 create or replace function is_full(IN number varchar(3), IN capacity int)
 returns boolean
 begin
-select flight_type, flight_capacity
+select plane_type, flight_capacity
 From(FIGHT F INNER JOIN PLANE P on F.plane_type = P.plane_type)
 where flight_number = number
 return flight_capacity = capacity;
@@ -73,10 +73,10 @@ if max_capacity = count then
 return;
 else
 UPDATE flight
-set flight_type = (select flight_type
+set plane_type = (select plane_type
 		   from PLANE
-		   where flight_capacity >= count
-	   	   order by flight_capacity ASC
+		   where flight_capacity > count AND owner_id =(select airline_id from FLIGHT F where F.flight_number = (select D1.flight_number from DETAIL D1 where D1.reservation_number = :new.reservation_number)
+	   	   order by flight_capacity DESC
 		   fetch first row only;)
 where flight_number=D.flight_number;
 END IF;
@@ -113,9 +113,9 @@ where (reservation_date <= dateadd(HOUR, 12, c_date) // add 12h)
 
 declare count = count_flight(D.flight_number)
 UPDATE FLIGHT
-set flight_type =(select plane_type
+set plane_type = (select plane_type
 from PLANE
-where plane_capacity >= count
+where plane_capacity >= count AND owner_id =(select airline_id from FLIGHT F where F.flight_number = (select D1.flight_number from DETAIL D1 where D1.flight_number = D.flight_number)
 order by flight_capacity DESC
 fetch first row only;)
 end;
@@ -135,4 +135,3 @@ where cid = (select cid from customer
 where frequent_miles != null)
 
 end;
-     
