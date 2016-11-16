@@ -58,10 +58,9 @@ airline_id varchar(5) not null,
 high_price int,
 low_price int,
 constraint pk_price primary key(departure_city, arrival_city),
-constraint fk_price foreign key(airline_id) references AIRLINE(airline_id) on delete cascade),
+constraint fk_price foreign key(airline_id) references AIRLINE(airline_id) on delete cascade,
 constraint ch_price check(high_price >= low_price));
 
--- Customer table has some inconsistence in the project description, the schema does not match the description of the datatype
 -- Check: Assuming salutation is not null, since it is 'one of three values'
 -- Customers have a first and last name (not null)
 create table CUSTOMER(
