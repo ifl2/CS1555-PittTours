@@ -38,6 +38,8 @@ constraint fk_plane foreign key(owner_id) references AIRLINE(airline_id) on dele
 
 -- Not Null: Every flight must have a depearture city and arrival city
 -- Plane deletion set null, flight can get a different plane
+-- Check: Departure city can not match arrival city
+-- Did not add check for arrival_time being before departure time, due to flights that pass over midnight
 create table FLIGHT(
 flight_number varchar(3) not null,
 airline_id varchar(5) not null,
@@ -48,9 +50,11 @@ departure_time varchar(4),
 arrival_time varchar(4),
 weekly_schedule varchar(7),
 constraint pk_flight primary key(flight_number),
-constraint fk_flight foreign key(plane_type, airline_id) references PLANE(plane_type, owner_id) on delete set null);
+constraint fk_flight foreign key(plane_type, airline_id) references PLANE(plane_type, owner_id) on delete set null,
+constraint ch_city_flight check(departure_city != arrival_city));
 
 -- Check: Low price must not be higher than high price
+-- Check: Departure city can not match arrival city
 create table PRICE(
 departure_city varchar(3) not null,
 arrival_city varchar(3) not null,
@@ -59,9 +63,10 @@ high_price int,
 low_price int,
 constraint pk_price primary key(departure_city, arrival_city),
 constraint fk_price foreign key(airline_id) references AIRLINE(airline_id) on delete cascade,
-constraint ch_price check(high_price >= low_price));
+constraint ch_price check(high_price >= low_price),
+constraint ch_city_price check(departure_city != arrival_city));
 
--- Check: Assuming salutation is not null, since it is 'one of three values'
+-- Check: Assuming salutation is not null, since it is 'one of three values' (Mr, Mrs, Ms)
 -- Customers have a first and last name (not null)
 create table CUSTOMER(
 cid varchar(9) not null,
