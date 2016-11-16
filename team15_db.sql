@@ -33,12 +33,11 @@ plane_capacity int not null,
 last_service date,
 year int,
 owner_id varchar(5) not null,
-constraint pk_plane primary key(plane_type),
+constraint pk_plane primary key(plane_type, owner_id),
 constraint fk_plane foreign key(owner_id) references AIRLINE(airline_id) on delete cascade);
 
 -- Not Null: Every flight must have a depearture city and arrival city
 -- Plane deletion set null, flight can get a different plane
--- Check: Must depeart before we arrive
 create table FLIGHT(
 flight_number varchar(3) not null,
 airline_id varchar(5) not null,
@@ -49,9 +48,7 @@ departure_time varchar(4),
 arrival_time varchar(4),
 weekly_schedule varchar(7),
 constraint pk_flight primary key(flight_number),
-constraint fk_flight1 foreign key(plane_type) references PLANE(plane_type) on delete set null,
-constraint fk_flight2 foreign key(airline_id) references AIRLINE(airline_id) on delete cascade,
-constraint ch_time check(departure_time < arrival_time));
+constraint fk_flight foreign key(plane_type, airline_id) references PLANE(plane_type, owner_id) on delete set null);
 
 -- Check: Low price must not be higher than high price
 create table PRICE(
@@ -83,6 +80,7 @@ frequent_miles varchar(5),
 constraint pk_customer primary key(cid),
 constraint ch_salutation check(salutation='Mr' OR salutation='Mrs' OR salutation='Ms'));
 
+-- Not Null: A reservation must have a start city and end city. It must also have ticketed status.
 -- Customer deletion cascade, if customer is removed, his reservations should be as well
 create table RESERVATION(
 reservation_number varchar(5) not null,
@@ -90,7 +88,9 @@ cid varchar(9) not null,
 cost int,
 credit_card_num varchar(16),
 reservation_date date,
-ticketed varchar(1),
+start_city varchar(3) not null,
+end_city varchar(3) not null,
+ticketed varchar(1) not null,
 constraint pk_reservation primary key(reservation_number),
 constraint fk_reservation foreign key(cid) references CUSTOMER(cid) on delete cascade);
 
