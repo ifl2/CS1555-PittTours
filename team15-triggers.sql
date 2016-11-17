@@ -1,4 +1,4 @@
-/* Trigger 1 */
+/* Trigger 1
 
 You should create a trigger, called adjustTicket, that adjusts the cost of a reservation when the price of one of its legs changes before the ticket is issued.
 
@@ -7,7 +7,7 @@ You should create a trigger, called adjustTicket, that adjusts the cost of a res
 2.b. update D.cost = new.low_price
 3. find if it is ticked or not (join 2 with RESERVATIONS using reservation_number)
 4. if ticketed = 'Y' do not do anything
-5. if ticketed = 'N' update R.cost( find all legs from each reservation, add the D.cost(each leg) and update the final cost( R.cost)
+5. if ticketed = 'N' update R.cost( find all legs from each reservation, add the D.cost(each leg) and update the final cost( R.cost)*/
 				
 create trigger adjustTicket				 
 after update of low_price
@@ -83,7 +83,7 @@ END IF;
 end;
 /
 
-/* Trigger 3 */
+/* Trigger 3 
 You should write a trigger, called cancelReservation, that cancels(deletes)all non-ticketed reservations for a flight, 12 hours prior 
 the flight (i.e., 12 hours before the flight is scheduled to depart) and if the number of ticketed passengers fits in a smaller capacity 
 plane, then the plane for that flight should be switched to the smaller-capacity plane
@@ -94,7 +94,7 @@ plane, then the plane for that flight should be switched to the smaller-capacity
 4. if ticketed = 'N' cancel reservation (cascade delete the flight from that reservation)
 5. if ticketed = 'Y' count all the tickets for each flight
 6. use the count to find a smaller plane if possible( select plane_type from PLANE where plane_capacity >= count , sort by min first)
-7. if find a smaller plane, update FLIGHT(where F.plane_type = P.plane_type)
+7. if find a smaller plane, update FLIGHT(where F.plane_type = P.plane_type) */
   
 create trigger CancelReservation				 
 after update of c_date
