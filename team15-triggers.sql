@@ -9,27 +9,26 @@ You should create a trigger, called adjustTicket, that adjusts the cost of a res
 4. if ticketed = 'Y' do not do anything
 5. if ticketed = 'N' update R.cost( find all legs from each reservation, add the D.cost(each leg) and update the final cost( R.cost)*/
 				
-create or replace trigger adjustTicket				 
+create trigger adjustTicket				 
 after update of low_price
 on PRICE
 for each row
 
-select R2.reservation_num, SUM(R2.cost) into new_cost
-from (((FLIGHT natural join PRICE) natural join DETAIL) natural join RESERVATION R2)
-group by reservation_number
-where D1.reservation_number IN (select D2.reservation_number
-from (PRICE P2 natural join FLIGHT F2) inner join DETAIL D2 on F2.flight_number=D2.flight_number) 
-where P2.departure_city=:new.departure_city and P2.arrival_city=:new.arrival_city)
+select r.reservation_number, SUM(r.cost) as new_cost
+from (((FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) full join DETAIL d1 on f1.flight_number = d1.flight_number) full join reservation r on d1.reservation_number=r.reservation_number)
+where d1.reservation_number IN (select d.reservation_number
+from (price p full join flight f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join detail d on f.flight_number = d.flight_number
+where p.departure_city=:new.departure_city and p.arrival_city=:new.arrival_city)
+group by r.reservation_number;
 
 when( EXISTS( 	SELECT  cid, ticketed
 		FROM RESERVATION
-		GROUP BY cid
-		HAVING ticketed = 'N'))
+		WHERE = 'N')
 BEGIN
-UPDATE RESERVATION R
-SET R.cost = new_cost
-where R.reservation_number = R1.reservation_number AND 'N' = (select ticketed from RESERVATION R1
-where R1.reservation_num = R2.reservation_number)
+UPDATE RESERVATION R4
+SET R4.cost = new_cost
+where R4.reservation_number = r.reservation_number AND 'N' = (select ticketed from RESERVATION R1
+where R1.reservation_num = r.reservation_number)
 END;
 /
 show errors;
