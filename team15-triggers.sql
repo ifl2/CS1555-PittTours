@@ -9,7 +9,7 @@ You should create a trigger, called adjustTicket, that adjusts the cost of a res
 4. if ticketed = 'Y' do not do anything
 5. if ticketed = 'N' update R.cost( find all legs from each reservation, add the D.cost(each leg) and update the final cost( R.cost)*/
 				
-create trigger adjustTicket				 
+create or replace trigger adjustTicket				 
 after update of low_price
 on PRICE
 for each row
@@ -24,7 +24,7 @@ where P2.departure_city=:new.departure_city and P2.arrival_city=:new.arrival_cit
 when( EXISTS( 	SELECT  cid, ticketed
 		FROM RESERVATION
 		GROUP BY cid
-		HAVING ticketed = 'N')
+		HAVING ticketed = 'N'))
 BEGIN
 UPDATE RESERVATION R
 SET R.cost = new_cost
@@ -32,7 +32,7 @@ where R.reservation_number = R1.reservation_number AND 'N' = (select ticketed fr
 where R1.reservation_num = R2.reservation_number)
 END;
 /
-
+show errors;
        
 /* Trigger 2 */
 
@@ -44,7 +44,7 @@ from DETAILS
 where DETAILS.flight_number =number;
 end;
 /
-
+show errors;
 
 create or replace function is_full(IN number varchar(3), IN capacity int)
 returns boolean
@@ -55,8 +55,9 @@ where flight_number = number
 return flight_capacity = capacity;
 end;
 /
+show errors;
 
-create trigger planeUpgrade
+create or replace trigger planeUpgrade
 before update of reservation_number
 on RESERVATION
 for each row
@@ -65,8 +66,9 @@ select flight_number
 from DETAIL D
 where D.flight_number= :new.flight_number
 
+
 declare count =  count_flight(D.flight_number)
-when(EXISTS( is_full(flight_number,count))
+when(EXISTS( is_full(flight_number,count)))
 select MAX(plane_capacity) into max_capacity
 from plane
 if max_capacity = count then
@@ -77,12 +79,12 @@ set plane_type = (select plane_type
 		   from PLANE
 		   where flight_capacity > count AND owner_id =(select airline_id from FLIGHT F where F.flight_number = (select D1.flight_number from DETAIL D1 where D1.reservation_number = :new.reservation_number)
 	   	   order by flight_capacity DESC
-		   fetch first row only;)
+		   fetch first row only;))
 where flight_number=D.flight_number;
 END IF;
 end;
 /
-
+show errors;
 /* Trigger 3 
 You should write a trigger, called cancelReservation, that cancels(deletes)all non-ticketed reservations for a flight, 12 hours prior 
 the flight (i.e., 12 hours before the flight is scheduled to depart) and if the number of ticketed passengers fits in a smaller capacity 
@@ -96,7 +98,7 @@ plane, then the plane for that flight should be switched to the smaller-capacity
 6. use the count to find a smaller plane if possible( select plane_type from PLANE where plane_capacity >= count , sort by min first)
 7. if find a smaller plane, update FLIGHT(where F.plane_type = P.plane_type) */
   
-create trigger CancelReservation				 
+create or replace trigger CancelReservation				 
 after update of c_date
 on TIME
 for each row
@@ -109,7 +111,7 @@ where ticketed = 'N' AND R.reservation_number IN (select D.reservation_number
 from FLIGHT natural join DETAIL
 where D.flight_number IN (select flight_number 
 from FLIGHT natural join RESERVATION
-where (reservation_date <= dateadd(HOUR, 12, c_date) // add 12h)
+where (reservation_date <= dateadd(HOUR, 12, c_date)))))
 
 declare count = count_flight(D.flight_number)
 UPDATE FLIGHT
@@ -117,14 +119,14 @@ set plane_type = (select plane_type
 from PLANE
 where plane_capacity >= count AND owner_id =(select airline_id from FLIGHT F where F.flight_number = (select D1.flight_number from DETAIL D1 where D1.flight_number = D.flight_number)
 order by flight_capacity DESC
-fetch first row only;)
+fetch first row only;))
 end;
 /
-						  
+show errors;					  
 						  
 						  
 /*Trigger extra*/
-create trigger ten_percent
+create or replace trigger ten_percent
 after insert of reservation_number
 on RESERVATION
 for each row
@@ -135,3 +137,5 @@ where cid = (select cid from customer
 where frequent_miles != null)
 
 end;
+/
+show errors;
