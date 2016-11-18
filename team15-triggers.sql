@@ -10,24 +10,33 @@ You should create a trigger, called adjustTicket, that adjusts the cost of a res
 5. if ticketed = 'N' update R.cost( find all legs from each reservation, add the D.cost(each leg) and update the final cost( R.cost)*/
 
 -- BROKEN
-create trigger adjustTicket				 
+create or replace trigger adjustTicket
 after update of low_price
 on PRICE
 for each row
-
-BEGIN
-Create or replace view price_view as select r.reservation_number, SUM(r.cost) as new_cost
-from (((FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) full join DETAIL d1 on f1.flight_number = d1.flight_number) full join reservation r on d1.reservation_number=r.reservation_number)
-where d1.reservation_number IN (select d.reservation_number
-from (price p full join flight f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join detail d on f.flight_number = d.flight_number
-where p.departure_city=:new.departure_city and p.arrival_city=:new.arrival_city)
-group by r.reservation_number;
-
-UPDATE RESERVATION R4
-SET R4.cost = new_cost
-where R4.reservation_number = (Select reservation_number from price_view) AND 'N' = (select ticketed from RESERVATION R1
-where R1.reservation_num = (Select reservation_number from price_view)
-END;
+begin
+	create or replace view PRICE_VIEW as
+		select r.reservation_number, SUM(r.cost) as new_cost
+		from (((FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city
+		and p1.arrival_city=f1.arrival_city) full join DETAIL d1 on f1.flight_number = d1.flight_number) full join RESERVATION r on d1.reservation_number=r.reservation_number)
+		where d1.reservation_number in (
+			select d.reservation_number
+			from (price p full join FLIGHT f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join DETAIL d on f.flight_number = d.flight_number
+			where p.departure_city=:new.departure_city
+			and p.arrival_city=:new.arrival_city)
+		group by r.reservation_number;
+		
+	update RESERVATION R4
+	set R4.cost = new_cost
+	where R4.reservation_number = (
+		select reservation_number
+		from PRICE_VIEW)
+	and 'N' = (
+		select ticketed from RESERVATION R1
+		where R1.reservation_num = (
+			select reservation_number 
+			from PRICE_VIEW));
+end;
 /
 
 /* Trigger 2 */
@@ -36,7 +45,7 @@ create or replace procedure count_flight(f_number in varchar, a_count out int)
 as
 begin
 	select count(flight_number) into a_count
-	from detail
+	from DETAIL
 	where flight_number = f_number;
 end;
 /
@@ -44,18 +53,19 @@ end;
 create or replace function is_full(f_number in varchar, capacity in int)
 return boolean
 as
-p_cap int;
+	p_cap int;
 begin
 	select plane.plane_capacity into p_cap
-	from flight, plane
-	where flight_number = f_number and flight.plane_type = plane.plane_type;
+	from FLIGHT, PLANE
+	where flight_number = f_number
+	and flight.plane_type = plane.plane_type;
 	return (p_cap = capacity);
 end;
 /
 
 create or replace trigger planeUpgrade
 before update
-on detail
+on DETAIL
 for each row
 declare
 	flight_n varchar(3);
@@ -63,20 +73,26 @@ declare
 	max_capacity int;
 begin
 	select flight_number into flight_n
-	from detail
+	from DETAIL
 	where flight_number = :new.flight_number;
 
 	count_flight(flight_n, flight_c);
 
 	if is_full(flight_n, flight_c) then
 		select max(plane_capacity) into max_capacity
-		from plane;
+		from PLANE;
 		if max_capacity != flight_c then
-			update flight
+			update FLIGHT
 			set plane_type = (
 				select plane_type
-				from plane
-				where plane_capacity > flight_c and owner_id = (select airline_id from flight where flight.flight_number = (select detail.flight_number from detail where reservation_number = :new.reservation_number and flight_number = :new.flight_number)
+				from PLANE
+				where plane_capacity > flight_c
+				and owner_id = (
+					select airline_id from FLIGHT
+					where flight.flight_number = (
+						select detail.flight_number from DETAIL
+						where reservation_number = :new.reservation_number
+						and flight_number = :new.flight_number)
 				order by plane_capacity desc
 				fetch first row only))
 			where flight_n = :new.flight_number;
@@ -101,36 +117,41 @@ plane, then the plane for that flight should be switched to the smaller-capacity
 -- BROKEN
 create or replace trigger CancelReservation
 after update
-on Our_Date
+on OUR_DATE
 for each row
 declare
 	flight_c int;
 begin
-	delete from reservation
+	delete from RESERVATION
 	where reservation_number in (
 		select reservation_number
-		from reservation R
+		from RESERVATION R
 		group by reservation_number
-		where ticketed = 'N' and reservation_number in (
+		where ticketed = 'N'
+		and reservation_number in (
 			select reservation_number
-			from flight natural join detail
+			from FLIGHT natural join DETAIL
 			where flight_number in (
 				select flight_number
-				from flight natural join reservation
-				where (reservation_date <= dateadd(HOUR, 12, c_date))
-			)
-		)
-	)
+				from FLIGHT natural join RESERVATION
+				where (reservation_date <= dateadd(HOUR, 12, c_date)))))
 
 	count_flight(flight_n, flight_c);
 
-	update flight
-	set plane_type =
-		(select plane_type
+	update FLIGHT
+	set plane_type = (
+		select plane_type
 		from PLANE
-		where plane_capacity >= flight_c and owner_id = (select airline_id from flight where flight.flight_number = (select detail.flight_number from detail where reservation_number = :new.reservation_number and flight_number = :new.flight_number)
-		order by plane_capacity desc
-		fetch first row only));
+		where plane_capacity >= flight_c
+		and owner_id = (
+			select airline_id
+			from FLIGHT
+			where flight.flight_number = (
+				select detail.flight_number from DETAIL
+				where reservation_number = :new.reservation_number
+				and flight_number = :new.flight_number)
+			order by plane_capacity desc
+			fetch first row only));
 end;
 /
 
@@ -138,13 +159,13 @@ end;
 /*Trigger extra*/
 create or replace trigger ten_percent
 after insert
-on reservation
+on RESERVATION
 for each row
 begin
-update reservation
-set cost = (cost * 0.9)
-where cid =
-	(select cid from customer
-	where frequent_miles != null);
+	update RESERVATION
+	set cost = (cost * 0.9)
+	where cid = (
+		select cid from CUSTOMER
+		where frequent_miles != null);
 end;
 /
