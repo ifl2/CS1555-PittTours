@@ -1,9 +1,10 @@
 /* Database schema PittTours */
 
-/* Constraint Comments:
-  All primary and foreign keys are set not null.
-  All foreign keys that reference an airline will cascade on delete if the airline no longer exists.
-    Being that people can't fly without an airline, deleting all connected to them makes sense.
+/*
+Overall Constraint Comments:
+	All primary and foreign keys are set not null.
+	All foreign keys that reference an airline will cascade on delete if the airline no longer exists.
+		Being that people can't fly without an airline, deleting all connected to them makes sense.
 */
 
 -- DROP TABLES
@@ -53,21 +54,22 @@ constraint pk_flight primary key(flight_number),
 constraint fk_flight foreign key(plane_type, airline_id) references PLANE(plane_type, owner_id) on delete set null,
 constraint ch_city_flight check(departure_city != arrival_city));
 
+-- Not Null: Flights must have pricing information, otherwise a lot of things will break
 -- Check: Low price must not be higher than high price
 -- Check: Departure city can not match arrival city
 create table PRICE(
 departure_city varchar(3) not null,
 arrival_city varchar(3) not null,
 airline_id varchar(5) not null,
-high_price int,
-low_price int,
+high_price int not null,
+low_price int not null,
 constraint pk_price primary key(departure_city, arrival_city),
 constraint fk_price foreign key(airline_id) references AIRLINE(airline_id) on delete cascade,
 constraint ch_price check(high_price >= low_price),
 constraint ch_city_price check(departure_city != arrival_city));
 
+-- Not Null: Customers have a first and last name
 -- Check: Assuming salutation is not null, since it is 'one of three values' (Mr, Mrs, Ms)
--- Customers have a first and last name (not null)
 create table CUSTOMER(
 cid varchar(9) not null,
 salutation varchar(3) not null,
@@ -84,14 +86,14 @@ frequent_miles varchar(5),
 constraint pk_customer primary key(cid),
 constraint ch_salutation check(salutation='Mr' OR salutation='Mrs' OR salutation='Ms'));
 
--- Not Null: A reservation must have a start city and end city. It must also have ticketed status.
+-- Not Null: A reservation must have a start city and end city. It must also have ticketed status and reservation date.
 -- Customer deletion cascade, if customer is removed, his reservations should be as well
 create table RESERVATION(
 reservation_number varchar(5) not null,
 cid varchar(9) not null,
 cost int,
 credit_card_num varchar(16),
-reservation_date date,
+reservation_date date not null,
 start_city varchar(3) not null,
 end_city varchar(3) not null,
 ticketed varchar(1) not null,
