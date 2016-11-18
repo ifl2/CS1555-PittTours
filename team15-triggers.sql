@@ -10,27 +10,23 @@ You should create a trigger, called adjustTicket, that adjusts the cost of a res
 5. if ticketed = 'N' update R.cost( find all legs from each reservation, add the D.cost(each leg) and update the final cost( R.cost)*/
 
 -- BROKEN
-create or replace trigger adjustTicket
+create trigger adjustTicket				 
 after update of low_price
 on PRICE
 for each row
-select r.reservation_number, SUM(reservation.cost) as new_cost
+
+BEGIN
+Create or replace view price_view as select r.reservation_number, SUM(r.cost) as new_cost
 from (((FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) full join DETAIL d1 on f1.flight_number = d1.flight_number) full join reservation r on d1.reservation_number=r.reservation_number)
 where d1.reservation_number IN (select d.reservation_number
 from (price p full join flight f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join detail d on f.flight_number = d.flight_number
 where p.departure_city=:new.departure_city and p.arrival_city=:new.arrival_city)
 group by r.reservation_number;
 
-
-when( EXISTS(	SELECT	cid, ticketed
-		FROM RESERVATION
-		WHERE ticketed = 'N'))
-BEGIN
-
 UPDATE RESERVATION R4
 SET R4.cost = new_cost
-where R4.reservation_number = r.reservation_number AND 'N' = (select ticketed from RESERVATION R1
-where R1.reservation_num = r.reservation_number)
+where R4.reservation_number = (Select reservation_number from price_view) AND 'N' = (select ticketed from RESERVATION R1
+where R1.reservation_num = (Select reservation_number from price_view)
 END;
 /
 
