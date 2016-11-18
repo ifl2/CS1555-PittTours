@@ -14,7 +14,7 @@ drop table PRICE cascade constraints;
 drop table CUSTOMER cascade constraints;
 drop table RESERVATION cascade constraints;
 drop table DETAIL cascade constraints;
-drop table TIME cascade constraints;
+drop table OUR_DATE cascade constraints;
 
 -- CREATE TABLES
 -- Not Null: Every airline must have a name
@@ -109,6 +109,6 @@ constraint pk_detail primary key(reservation_number, leg),
 constraint fk_detail1 foreign key(reservation_number) references RESERVATION(reservation_number) on delete cascade,
 constraint fk_detail2 foreign key(flight_number) references FLIGHT(flight_number) on delete set null);
 
-create table Our_Date(
+create table OUR_DATE(
 c_date date not null,
 constraint pk_time primary key(c_date));
