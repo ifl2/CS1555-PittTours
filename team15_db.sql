@@ -109,6 +109,6 @@ constraint pk_detail primary key(reservation_number, leg),
 constraint fk_detail1 foreign key(reservation_number) references RESERVATION(reservation_number) on delete cascade,
 constraint fk_detail2 foreign key(flight_number) references FLIGHT(flight_number) on delete set null);
 
-create table TIME(
+create table Our_Date(
 c_date date not null,
 constraint pk_time primary key(c_date));
