@@ -505,11 +505,11 @@ insert into customer values('987654321',  'Ms', 'Bill',       'Bob',         '51
 Reservation(reservation_number, cid, cost, credit_card_num, reservation_date, ticketed)
 	reservation_number varchar(5) = generated sequentially starting at 00000
 	cid varchar(9) -> customer.cid = generated randomly from cid
-	cost int = NEEDS ADDED, BASE ON PRICES
+	cost int = calculated from cost and flight time in details
 	credit_card_num varchar(16) = matches credit_card_num of cid
-	reservation_date date = generated randomly (01/01/2015 to 12/31/2015) NEED TIME ADDED
-	start_city varchar(3) = NEEDS ADDED
-	end_city varchar(3) = NEEDS ADDED
+	reservation_date date = generated randomly (01/01/2015 to 12/31/2015) [[[[[!!NEED TIME ADDED!!]]]]]
+	start_city varchar(3) = matches flight plan from details
+	end_city varchar(3) = matches flight plan from details
 	ticketed varchar(1) -> Y/N = generated randomly, 10% chance of N */
 
 -- 2 one-way: 2 leg
