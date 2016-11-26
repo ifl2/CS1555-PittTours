@@ -64,8 +64,8 @@ end;
 /
 
 create or replace trigger planeUpgrade
-before update
 on DETAIL
+instead of update
 for each row
 declare
 	flight_n varchar(3);
@@ -81,7 +81,7 @@ begin
 	if is_full(flight_n, flight_c) then
 		select max(plane_capacity) into max_capacity
 		from PLANE;
-		if max_capacity != flight_c then
+		if max_capacity >= flight_c then
 			update FLIGHT
 			set plane_type = (
 				select plane_type
@@ -98,6 +98,8 @@ begin
 			where flight_n = :new.flight_number;
 		end if;
 	end if;
+	Begin
+	RAISERROR(Flight FULL);
 end;
 /
 
@@ -121,7 +123,7 @@ for each row
 declare
 	flight_c int;
 begin
-		delete from RESERVATION R1
+	delete from RESERVATION R1
 	where R1.reservation_number in ( select R.reservation_number 
 from RESERVATION R
 where (R.ticketed = 'N' and R.reservation_number in (select D.reservation_number
