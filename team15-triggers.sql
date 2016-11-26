@@ -1,7 +1,5 @@
 /* Trigger 1
-
 You should create a trigger, called adjustTicket, that adjusts the cost of a reservation when the price of one of its legs changes before the ticket is issued.
-
 1. when update PRICE (join PRICE with FLIGHT using departure_city and arrival_city)
 2. find if any reservation is using that flight( join 1 with DETAIL using flight_number)
 2.b. update D.cost = new.low_price
@@ -26,14 +24,16 @@ begin
 			and p.arrival_city=:new.arrival_city)
 		group by r.reservation_number;
 		
+
+
 	update RESERVATION R4
-	set R4.cost = new_cost
-	where R4.reservation_number = (
+	set R4.cost = (select new_cost from PRICE_VIEW pw where pw.reservation_number= R4.reservation_number)
+	where R4.reservation_number IN (
 		select reservation_number
 		from PRICE_VIEW)
-	and 'N' = (
+	and 'N' IN (
 		select ticketed from RESERVATION R1
-		where R1.reservation_num = (
+		where R1.reservation_number IN (
 			select reservation_number 
 			from PRICE_VIEW));
 end;
@@ -105,7 +105,6 @@ end;
 You should write a trigger, called cancelReservation, that cancels(deletes)all non-ticketed reservations for a flight, 12 hours prior
 the flight (i.e., 12 hours before the flight is scheduled to depart) and if the number of ticketed passengers fits in a smaller capacity
 plane, then the plane for that flight should be switched to the smaller-capacity plane
-
 1. find all flights that are 12h before depart in FLIGHT table(check week date and time)
 2. find all reservations for those flights(join FLIGHT with DETAIL using flight_number)
 3. find if it is ticked or not (join 2 with RESERVATIONS using reservation_number)
@@ -132,9 +131,9 @@ begin
 			select reservation_number
 			from FLIGHT natural join DETAIL
 			where flight_number in (
-				select flight_number
-				from FLIGHT natural join RESERVATION
-				where (reservation_date <= dateadd(HOUR, 12, c_date)))))
+				select F4.flight_number
+				from FLIGHT F4 full join RESERVATION R6 on F4.departure_city = R6.departure_city and F4.arrival_city = R6.arrival_city
+				where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-Mon-YY hh:mi') from our_date))))
 
 	count_flight(flight_n, flight_c);
 
