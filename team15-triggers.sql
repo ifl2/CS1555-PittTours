@@ -121,19 +121,14 @@ for each row
 declare
 	flight_c int;
 begin
-	delete from RESERVATION
-	where reservation_number in (
-		select reservation_number
-		from RESERVATION R
-		group by reservation_number
-		where ticketed = 'N'
-		and reservation_number in (
-			select reservation_number
-			from FLIGHT natural join DETAIL
-			where flight_number in (
-				select F4.flight_number
-				from FLIGHT F4 full join RESERVATION R6 on F4.departure_city = R6.departure_city and F4.arrival_city = R6.arrival_city
-				where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-Mon-YY hh:mi') from our_date))))
+		delete from RESERVATION R1
+	where R1.reservation_number in ( select R.reservation_number 
+from RESERVATION R
+where (R.ticketed = 'N' and R.reservation_number in (select D.reservation_number
+from FLIGHT F full join DETAIL D on f.flight_number = D.flight_number
+where F.flight_number in ( select F4.flight_number
+from FLIGHT F4 full join RESERVATION R6 on F4.departure_city = R6.start_city and F4.arrival_city = R6.end_city 
+where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-Mon-YY hh:mi') from our_date)))))
 
 	count_flight(flight_n, flight_c);
 
