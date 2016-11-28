@@ -1,0 +1,140 @@
+
+
+
+1#
+
+drop table AIRLINE cascade constraints;
+drop table PLANE cascade constraints;
+drop table FLIGHT cascade constraints;
+drop table PRICE cascade constraints;
+drop table CUSTOMER cascade constraints;
+drop table RESERVATION cascade constraints;
+drop table DETAIL cascade constraints;
+drop table OUR_DATE cascade constraints;
+
+2#
+
+System.out.println("Please enter file name with airline information: ");
+String filename = scan.nextLine();
+try{
+FileInputStream fstream = new FileInputStream(filename);
+DataInputStream in = new DataInputStream(fstream);
+BufferedReader br = new BufferedReader(new InputStreamReader(in));
+String strLine;
+while((strLine = br.readLine()) !=null){
+String[] tokens = strLine.split(",");
+int year = Integer.parseInt(tokens[4]);
+query = "INSERT INTO airline VALUES(?,?,?,?,?)";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, tokens[0]);
+      updateStatement.setString(2,tokens[1]);
+      updateStatement.setString(3,tokens[2]);
+      updateStatement.setString(4,tokens[3]);
+      updateStatement.setInt(5, year);    
+      updateStatement.executeUpdate();
+ }
+}
+
+3#
+
+System.out.println("Please enter file name with Schedule information: ");
+String filename = scan.next();
+try{
+FileInputStream fstream = new FileInputStream(filename);
+DataInputStream in = new DataInputStream(fstream);
+BufferedReader br = new BufferedReader(new InputStreamReader(in));
+String strLine;
+while((strLine = br.readLine()) !=null){
+String[] tokens = strLine.split(",");
+query = "INSERT INTO flight VALUES(?,?,?,?,?,?,?,?)";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,tokens[0]);
+      updateStatement.setString(2,tokens[1]);
+      updateStatement.setString(3,tokens[2]);
+      updateStatement.setString(4,tokens[3]);
+      updateStatement.setString(5,tokens[4]); 
+      updateStatement.setString(6,tokens[5]); 
+      updateStatement.setString(7,tokens[6]); 
+      updateStatement.setString(8,tokens[7]);    
+      updateStatement.executeUpdate();
+ }
+}
+
+
+4#
+while(true){
+System.out.println(" Please enter L(Load Price) or C(change price): ");
+String answer = scan.nextLine();
+
+if( answer = 'L'){
+System.out.println("Please enter file name with Pricing information: ");
+String filename = scan.nextLine();
+try{
+FileInputStream fstream = new FileInputStream(filename);
+DataInputStream in = new DataInputStream(fstream);
+BufferedReader br = new BufferedReader(new InputStreamReader(in));
+String strLine;
+while((strLine = br.readLine()) !=null){
+String[] tokens = strLine.split(",");
+int high = Integer.parseInt(tokens[3]);
+int low = Integer.parseInt(tokens[4]);
+query = "INSERT INTO flight VALUES(?,?,?,?,?,?,?,?)";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,tokens[0]);
+      updateStatement.setString(2,tokens[1]);
+      updateStatement.setString(3,tokens[2]);
+      updateStatement.setInt(4,high);
+      updateStatement.setInt(5,low); 
+      updateStatement.executeUpdate();
+ }
+}
+break;
+}
+else if(answer = 'C'){
+System.out.println(" Please enter Departure City 3 letter code, Arrival City 3 letter code, High price and Low price separated by blankspaces: ");
+String answer = scan.nextLine();
+String[] tokens = answer.split(" ");
+int high = Integer.parseInt(tokens[2]);
+int low = Integer.parseInt(tokens[3]);
+query = "UPDATE price SET high_price = ? ,low_price = ? WHERE departure_city = ? AND arrival_city = ?";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setInt(1,high);
+      updateStatement.setInt(2,low);
+      updateStatement.setString(3,tokens[0]);
+      updateStatement.setstring(4,tokens[1]);
+      updateStatement.executeUpdate();
+break;
+}
+else{
+ System.out.println("Invalid Choice!");
+}
+}
+
+
+5#
+
+System.out.println("Please enter file name with Plane information: ");
+String filename = scan.nextLine();
+try{
+FileInputStream fstream = new FileInputStream(filename);
+DataInputStream in = new DataInputStream(fstream);
+BufferedReader br = new BufferedReader(new InputStreamReader(in));
+String strLine;
+while((strLine = br.readLine()) !=null){
+String[] tokens = strLine.split(",");
+int capacity = Integer.parseInt(tokens[2]);
+int year = Integer.paserInt(tokens[4]);
+java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/DD/YYYY");
+java.sql.Date date = new java.sql.Date (df.parse(tokens[3]).getTime());
+
+query = "INSERT INTO airline VALUES(?,?,?,?,?,?)";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, tokens[0]);
+      updateStatement.setString(2,tokens[1]);
+      updateStatement.setInt(3,capacity);
+      updateStatement.setDate(4,date);
+      updateStatement.setInt(5, year); 
+      updateStatement.setString(6, tokens[5]);   
+      updateStatement.executeUpdate();
+ }
+}
