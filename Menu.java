@@ -10,29 +10,31 @@ public class Menu {
 	private String inputString, file, query;
 	private Scanner scan = new Scanner(System.in);
 
+	// CONNECT TO THE DATABASE
 	public void connectDB() {
 		System.out.println("CONNECTING TO DB");
 		System.out.print("Username: ");
 		String username = scan.nextLine();
-		Console console = System.console();
+		Console console = System.console(); // Hides password input in console
 		String password = new String(console.readPassword("Password: "));
 		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 		try {
 			DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver());
 			connection = DriverManager.getConnection(url, username, password);
-			System.out.println("Sucessfully connected to database");
 		} catch(Exception Ex) {
 			System.out.println("Error connecting to database.  Machine Error: " + Ex.toString());
 			Ex.printStackTrace();
 		}
 	}
 
+	// GET ACCESS TYPE (ADMINISTRATOR/CUSTOMER)
 	public void getAccess() {
 		System.out.println("\nWelcome to PittTours are you a: ");
 		System.out.println("1: Administrator");
 		System.out.println("2: Customer");
 		System.out.println("3: Neither, Quit\n");
-
+		
+		// Get user input
 		System.out.print("Enter menu choice: ");
 		inputString = scan.nextLine();
 		int choice;
@@ -42,6 +44,7 @@ public class Menu {
 			choice = 0;
 		}
 
+		// Handle user input
 		if(choice == 1)
 			displayAdmInterface();
 		else if(choice == 2)
@@ -50,8 +53,13 @@ public class Menu {
 			System.out.println("\nEXITING");
 			System.exit(0);
 		}
+		else { // If invalid choice, recall method
+			System.out.println("INVALID CHOICE");
+			getAccess();
+		}
 	}
 
+	// ADMINISTRATOR INTERFACE
 	public void displayAdmInterface() {
 		System.out.println("\nAVAILABLE ADMINISTRATOR COMMANDS:");
 		System.out.println("1: Erase the Database");
@@ -62,6 +70,7 @@ public class Menu {
 		System.out.println("6: Generate passenger manifest of flight on day");
 		System.out.println("7: Quit\n");
 
+		// Get user input
 		System.out.print("Enter command number: ");
 		inputString = scan.nextLine();
 		int choice;
@@ -74,7 +83,7 @@ public class Menu {
 		if(choice == 1) {
 			System.out.print("Are you sure you want to delete the database? (Y/N): ");
 			inputString = scan.nextLine();
-			if(inputString.equals("Y")) {
+			if(inputString.equals("Y") || inputString.equals("y")) {
 				try {
 					statement = connection.createStatement();
 					statement.executeQuery("drop table PLANE cascade constraints");
@@ -104,10 +113,10 @@ public class Menu {
 				"C: Change flight price\n");
 			System.out.print("Enter Command: ");
 			inputString = scan.nextLine();
-			if(inputString.equals("L")) {
+			if(inputString.equals("L") || inputString.equals("l")) {
 				// LOAD FILE BY LINE, PARSE BY COMMA, INSERT INTO PRICES
 			}
-			else if(inputString.equals("C")) {
+			else if(inputString.equals("C") || inputString.equals("c")) {
 				String dCity, aCity, hPrice, lPrice;
 				System.out.println("YOU HAVE CHOSEN TO CHANGE A FLIGHT PRICE");
 				System.out.print("What is the departure city of the flight you wish to change?: ");
@@ -127,7 +136,7 @@ public class Menu {
 					"\nIs this this correct? (Y/N)\n");
 				inputString = scan.nextLine();
 
-				if(inputString.equals("Y")) {
+				if(inputString.equals("Y") || inputString.equals("y")) {
 					// UPDATE WITH PRICE THAT HAS THE ABOVE INFORMATION
 					System.out.println("PRICE CHANGED");
 				}
@@ -154,11 +163,13 @@ public class Menu {
 		else
 			System.out.println("INVALID CHOICE");
 
+		// Repeat menu after pause
 		System.out.print("Press Enter to Continue... ");
 		inputString = scan.nextLine();
 		displayAdmInterface();
 	}
 
+	// CUSTOMER INTERFACE
 	private void displayCusInterface() {
 		System.out.println("\nAVAILABLE CUSTOMER COMMANDS:");
 		System.out.println("1: Add customer");
@@ -173,6 +184,7 @@ public class Menu {
 		System.out.println("10: Buy ticket from existing reservation");
 		System.out.println("11: Quit\n");
 
+		// Get user input
 		System.out.print("Enter command number: ");
 		inputString = scan.nextLine();
 		int choice;
@@ -219,6 +231,7 @@ public class Menu {
 		else
 			System.out.println("INVALID CHOICE");
 
+		// Repeat menu after pause
 		System.out.print("Press Enter to Continue... ");
 		inputString = scan.nextLine();
 		displayCusInterface();
@@ -226,8 +239,8 @@ public class Menu {
 
 	public static void main(String args[]) throws SQLException {
 		Menu menu = new Menu();
-		menu.connectDB();
-		menu.getAccess();
-		connection.close();
+		menu.connectDB(); // Connect to the Database
+		menu.getAccess(); // Determine Admin or Customer access, then run interface
+		connection.close(); // Close connection (needs added before system.exits?)
 	}
 }
