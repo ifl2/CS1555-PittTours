@@ -138,3 +138,30 @@ PreparedStatement updateStatement = connection.prepareStatement(query);
       updateStatement.executeUpdate();
  }
 }
+
+6#
+
+System.out.println(" Please enter Flight Number and date(MM/DD/YYYY): ");
+String answer = scan.nextLine();
+String[] tokens = answer.split(" ");
+java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/DD/YYYY");
+java.sql.Date date = new java.sql.Date (df.parse(tokens[1]).getTime());
+
+query = "SELECT salutation, first_name, last_name FROM (customer c full join reservation r on c.cid = r.cid) full join detail d on r.reservation_number = d.reservation_number WHERE d.flight_number=? AND d.flight_date=?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, tokens[0]);
+      updateStatement.setDate(2,date);
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+	counter=1;
+      while(resultSet.next())
+      {
+        System.out.println("Passenger " + counter + ": " +
+             resultSet.getString(1) + ", " +
+             resultSet.getString(2) + ", " +
+             resultSet.getString(3));
+	  counter ++;
+      }
+
+
