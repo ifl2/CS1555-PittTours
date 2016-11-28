@@ -165,3 +165,54 @@ resultSet = statement.executeQuery(query);
       }
 
 
+1#
+System.out.println(" Please enter Salutation (Mr/Mrs/Ms):");
+String salutation = scan.nextLine();
+System.out.println(" Please enter First Name: ");
+String first = scan.nextLine();
+System.out.println(" Please enter Last Name: ");
+String last = scan.nextLine();
+
+query= "SELECT * FROM customer where first_name = ?  AND last_name = ?";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,first);
+      updateStatement.setString(2,last);
+      updateStatement.executeUpdate();
+
+System.out.println(" Please enter Street address: ");
+String street = scan.nextLine();
+System.out.println(" Please enter City: ");
+String city = scan.nextLine();
+System.out.println(" Please enter State: ");
+String state = scan.nextLine();
+System.out.println(" Please enter Phone Number: ");
+String phone = scan.nextLine();
+System.out.println(" Please enter Email address: ");
+String email = scan.nextLine();
+System.out.println(" Please enter Credit Card Number: ");
+String cardNum = scan.nextLine();
+System.out.println(" Please enter Credit Card Expiration date: ");
+String expire = scan.nextLine();
+
+
+
+
+
+
+query = "INSERT INTO customer VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, cid);
+      updateStatement.setString(2,salutation);
+      updateStatement.setString(3,first);
+      updateStatement.setString(4,last);
+      updateStatement.setString(5, cardNum);    
+      updateStatement.setDate(6,expire);
+      updateStatement.setString(7,street);
+      updateStatement.setString(8,city);
+      updateStatement.setString(9,state);
+      updateStatement.setString(10, phone); 
+      updateStatement.setString(11, email);
+      updateStatement.setString(12, miles);
+      updateStatement.executeUpdate();
+
+
