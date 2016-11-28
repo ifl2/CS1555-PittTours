@@ -4,14 +4,13 @@ import java.io.*;
 import java.text.ParseException;
 
 public class Menu {
+	private static Connection connection;
 	private Statement statement;
 	private ResultSet resultSet;
 	private String inputString, file, query;
 	private Scanner scan = new Scanner(System.in);
 
 	public void connectDB() {
-
-
 		System.out.println("CONNECTING TO DB");
 		System.out.print("Username: ");
 		String username = scan.nextLine();
@@ -20,17 +19,16 @@ public class Menu {
 		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 		try {
 			DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver());
-			Connection connection = DriverManager.getConnection(url, username, password);
-		}
-		catch(Exception Ex) {
+			connection = DriverManager.getConnection(url, username, password);
+			System.out.println("Sucessfully connected to database");
+		} catch(Exception Ex) {
 			System.out.println("Error connecting to database.  Machine Error: " + Ex.toString());
 			Ex.printStackTrace();
 		}
 	}
 
 	public void getAccess() {
-
-		System.out.println("Welcome to PittTours are you a: ");
+		System.out.println("\nWelcome to PittTours are you a: ");
 		System.out.println("1: Administrator");
 		System.out.println("2: Customer");
 		System.out.println("3: Neither, Quit\n");
@@ -77,7 +75,17 @@ public class Menu {
 			System.out.print("Are you sure you want to delete the database? (Y/N): ");
 			inputString = scan.nextLine();
 			if(inputString.equals("Y")) {
-				// DROP TABLES
+				try {
+					statement = connection.createStatement();
+					statement.executeQuery("drop table PLANE cascade constraints");
+					statement.executeQuery("drop table FLIGHT cascade constraints");
+					statement.executeQuery("drop table PRICE cascade constraints");
+					statement.executeQuery("drop table CUSTOMER cascade constraints");
+					statement.executeQuery("drop table RESERVATION cascade constraints");
+					statement.executeQuery("drop table DETAIL cascade constraints");
+					statement.executeQuery("drop table OUR_DATE cascade constraints");
+					statement.executeQuery("drop table AIRLINE cascade constraints");
+				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 				System.out.println("DATABASE ERASED");
 			}
 			else
@@ -128,7 +136,6 @@ public class Menu {
 			}
 			else
 				System.out.println("INVALID CHOICE");
-
 		}
 		else if(choice == 5) {
 			// LOAD FILE BY LINE, PARSE BY COMMA, INSERT INTO PLANES
@@ -177,42 +184,32 @@ public class Menu {
 
 		if(choice == 1) {
 
-
 		}
 		else if(choice == 2) {
-
 
 		}
 		else if(choice == 3) {
 
-
 		}
 		else if(choice == 4) {
-
 
 		}
 		else if(choice == 5) {
 
-
 		}
 		else if(choice == 6) {
-
 
 		}
 		else if(choice == 7) {
 
-
 		}
 		else if(choice == 8) {
-
 
 		}
 		else if(choice == 9) {
 
-
 		}
 		else if(choice == 10) {
-
 
 		}
 		else if(choice == 11) {
@@ -227,9 +224,10 @@ public class Menu {
 		displayCusInterface();
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws SQLException {
 		Menu menu = new Menu();
 		menu.connectDB();
 		menu.getAccess();
+		connection.close();
 	}
 }
