@@ -264,12 +264,38 @@ public class Menu {
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
-		else if(choice == 6) {
-			String flightNum, flightDate;
-			System.out.print("What is the flight number?: ");
-			flightNum = scan.nextLine();
-			System.out.print("What is the flight date? (FORMAT HERE): ");
-			flightDate = scan.nextLine();
+		else if(choice == 6) { // TESTED & WORKING
+			try {
+				String flightNum, flightDate;
+				System.out.print("Enter flight number: ");
+				flightNum = scan.nextLine();
+				System.out.print("Enter flight date (MM/DD/YYYY): ");
+				flightDate = scan.nextLine();
+				java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
+				java.sql.Date date = null;
+				try { date = new java.sql.Date(df.parse(flightDate).getTime());
+				} catch(Exception e) {System.out.println("INVALID DATE");}
+				query = "SELECT salutation, first_name, last_name " +
+						"FROM (customer c full join reservation r on c.cid = r.cid) " +
+						"full join detail d on r.reservation_number = d.reservation_number " +
+						"WHERE d.flight_number = ? AND d.flight_date = ?";
+				PreparedStatement updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,flightNum);
+				updateStatement.setDate(2,date);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				int counter = 1;
+				System.out.println("\nPASSENGERS OF FLIGHT " + flightNum + " ON " + flightDate + ":");
+				while(resultSet.next()) {
+					System.out.println(
+						"Passenger " + counter + ": " +
+						resultSet.getString(1) + ". " +
+						resultSet.getString(2) + " " +
+						resultSet.getString(3));
+					counter ++;
+				}
+				System.out.println(""); // For formatting
+			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 7) {
 			System.out.println("EXITING");
