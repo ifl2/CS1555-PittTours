@@ -235,3 +235,36 @@ PreparedStatement updateStatement = connection.prepareStatement(query);
 System.out.println("Customer added with success to the database");
 System.out.println("PittRewards number: " + cid);
 
+2#
+
+System.out.println(" Please enter Customer First Name");
+String first = scan.nextLine();
+System.out.println(" Please enter Last Name: ");
+String last = scan.nextLine();
+
+query = "SELECT * FROM customer where first_name = ? and last_name = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, first);
+      updateStatement.setString(2, last);     
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+      while(resultSet.next())
+      {
+        System.out.println(" CID: " +
+             resultSet.getString(1) + "\n Salutation: " +
+	     resultSet.getString(2) + "\n First Name: " +
+             resultSet.getString(3) + "\n Last Name: " +
+             resultSet.getString(4) + "\n Credit Card Number: " +
+             resultSet.getString(5) + "\n Credit Card Expiration: " +
+             resultSet.getString(6) + "\n Street address: " +
+             resultSet.getString(7) + "\n City: " +
+             resultSet.getString(8) + "\n State: " +
+             resultSet.getString(9) + "\n Phone Number: " +
+             resultSet.getString(10) + "\n Email: " +
+             resultSet.getString(11) + "\n Frequent Miles: " +
+             resultSet.getString(12));
+      }
+
+
+
