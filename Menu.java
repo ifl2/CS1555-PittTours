@@ -474,7 +474,7 @@ public class Menu {
 				query = "select flight_number, departure_time, arrival_time from FLIGHT where departure_city = ? and arrival_city = ?";
 				PreparedStatement updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1,depart);
-				updateStatement.setString(2,arrive);     
+				updateStatement.setString(2,arrive);
 				updateStatement.executeUpdate();
 				resultSet = updateStatement.executeQuery(query);
 				System.out.println("\nAll direct routes between " + depart + " -> " + arrive + ":");
@@ -492,7 +492,7 @@ public class Menu {
 				updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1, depart);
 				updateStatement.setString(2, depart);
-				updateStatement.setString(3, arrive);     
+				updateStatement.setString(3, arrive);
 				updateStatement.executeUpdate();
 				resultSet = updateStatement.executeQuery(query);
 				while(resultSet.next()) {
@@ -500,7 +500,7 @@ public class Menu {
 					updateStatement = connection.prepareStatement(query);
 					updateStatement.setString(1, arrive);
 					updateStatement.setString(2, arrive);
-					updateStatement.setString(3, depart);     
+					updateStatement.setString(3, depart);
 					updateStatement.executeUpdate();
 					resultSet2 = updateStatement.executeQuery(query);
 					while(resultSet2.next()) {
@@ -508,17 +508,17 @@ public class Menu {
 							System.out.println("\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":");
 							System.out.println(
 								"First Leg:" +
-								"\n Flight number: " + resultSet.getString(1) + 
+								"\n Flight number: " + resultSet.getString(1) +
 								"\n Departure Time: " + resultSet.getString(2) +
 								"\n Departure City: " + depart +
 								"\n Arrival Time: " + resultSet.getString(3) +
 								"\n Arrival City: " + resultSet.getString(4));
 							System.out.println(
 								"Second Leg:" +
-								"\n Flight number: " + resultSet2.getString(1) + 
+								"\n Flight number: " + resultSet2.getString(1) +
 								"\n Departure Time: " + resultSet2.getString(2) +
 								"\n Departure City: " + resultSet2.getString(4) +
-								"\n Arrival Time: " + resultSet2.getString(3) + 
+								"\n Arrival Time: " + resultSet2.getString(3) +
 								"\n Arrival City: " + arrive);
 						}
 					}
@@ -527,7 +527,72 @@ public class Menu {
 			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 5) {
-
+			// Get cities and airline
+			System.out.print("Please enter Departure City (3 letter): ");
+			String depart = scan.nextLine();
+			System.out.print("Please enter Arrival City (3 letter): ");
+			String arrive = scan.nextLine();
+			System.out.print("Please enter Airline name (full name): ");
+			String airline = scan.nextLine();
+			// Get direct flights
+			try {
+				query = "SELECT flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?";
+				PreparedStatement updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1, depart);
+				updateStatement.setString(2, arrive);
+				updateStatement.setString(3, airline);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				System.out.println("\nAll direct routes between " + depart + " -> " + arrive + " for airline " + airline + ":");
+				int counter = 1;
+				while(resultSet.next()) {
+					System.out.println("Route " + counter + ": ");
+					System.out.println(
+						" Flight number: " + resultSet.getString(1) +
+						"\n Departure Time: " + resultSet.getString(2) +
+						"\n Arrival Time: " + resultSet.getString(3));
+					counter++;
+				}
+				// Get connected flights
+				query = "SELECT f.airline_id, f.flight_number, f.departure_time, f.arrival_time, f.arrival_city FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND airline_name = ? AND arrival_city in (SELECT arrival_city from (SELECT f1.arrival_city FROM flight f1 where f1.departure_city = ?) natural join (SELECT f2.departure_city from flight f2 where f2.arrival_city = ?) where arrival_city = departure_city)";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1, depart);
+				updateStatement.setString(2, airline);
+				updateStatement.setString(3, depart);
+				updateStatement.setString(4, arrive);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				while(resultSet.next()) {
+					query = "SELECT f.airline_id, f.flight_number, f.departure_time, f.arrival_time, f.departure_city FROM flight f full join airline a on f.airline_id = a.airline_id WHERE arrival_city = ? AND airline_name = ? AND departure_city in (SELECT departure_city from (SELECT f1.departure_city FROM flight f1 where f1.arrival_city = ?) natural join (SELECT f2.arrival_city from flight f2 where f2.departure_city = ?) where arrival_city = departure_city)";
+					updateStatement = connection.prepareStatement(query);
+					updateStatement.setString(1, arrive);
+					updateStatement.setString(2, airline);
+					updateStatement.setString(3, arrive);
+					updateStatement.setString(4, depart);
+					updateStatement.executeUpdate();
+					resultSet2 = statement.executeQuery(query);
+					while(resultSet2.next()) {
+						if(resultSet.getString(4).equals(resultSet2.getString(4))) {
+							System.out.println("\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":");
+							System.out.println(
+								"First Leg:" +
+								"\n Flight number: " + resultSet.getString(1) +
+								"\n Departure Time: " + resultSet.getString(2) +
+								"\n Departure City: " + depart +
+								"\n Arrival Time: " + resultSet.getString(3) +
+								"\n Arrival City: " + resultSet.getString(4));
+							System.out.println(
+								"Second Leg:" +
+								"\n Flight number: " + resultSet2.getString(1) +
+								"\n Departure Time: " + resultSet2.getString(2) +
+								"\n Departure City: " + resultSet2.getString(4) +
+								"\n Arrival Time: " + resultSet2.getString(3) +
+								"\n Arrival City: " + arrive);
+						}
+					}
+					System.out.println(""); // For formatting
+				}
+			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 6) {
 
