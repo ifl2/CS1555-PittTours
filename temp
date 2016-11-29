@@ -493,3 +493,16 @@ else{
 
       }
 }
+
+10#
+
+System.out.println(" Please enter reservation number");
+String num = scan.nextLine();
+
+query = "UPDATE reservation SET ticketed = 'Y' WHERE reservation_number = ?"
+
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, num);
+      updateStatement.executeUpdate();
+System.out.println("TICKET WAS CHANGED TO PURCHASED");
+
