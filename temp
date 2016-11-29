@@ -339,4 +339,38 @@ resultSet = statement.executeQuery(query);
              resultSet.getString(1) + "  Departure Time: " +
 	     resultSet.getString(2) + "  Arrival Time: " +
 	     resultSet.getString(3));
+	     counter++;
       }
+      
+5#
+
+System.out.println(" Please enter Departure City(3 letter)");
+String depart = scan.nextLine();
+System.out.println(" Please enter Arrival City(3 letter)");
+String arrive = scan.nextLine();
+System.out.println(" Please enter Airline name");
+String airline = scan.nextLine();
+
+query = "SELECT airline_id, flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?"
+
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, depart);
+      updateStatement.setString(2, arrive); 
+      updateStatement.setString(3, airline);    
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+      
+      System.out.println("All routes between " + depart + " -> " arrive " for Airline: " + airline);
+      int counter = 1;
+      while(resultSet.next())
+      {
+	System.out.println("Route " + counter + ": ");
+	System.out.println("Airline ID: + resultSet.getString(1) + " Flight number: " +
+             resultSet.getString(2) + "  Departure Time: " +
+	     resultSet.getString(3) + "  Arrival Time: " +
+	     resultSet.getString(4));
+	counter++;
+      }
+
+
