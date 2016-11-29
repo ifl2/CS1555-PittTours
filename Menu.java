@@ -122,8 +122,31 @@ public class Menu {
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
-		else if(choice == 3) {
-			// LOAD FILE BY LINE, PARSE BY COMMA, INSERT INTO FLIGHTS
+		else if(choice == 3) { // TESTED & WORKING
+			try {
+				System.out.print("Please enter file name with schedule information: ");
+				String filename = scan.nextLine();
+				FileInputStream fstream = new FileInputStream(filename);
+				DataInputStream in = new DataInputStream(fstream);
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				String strLine;
+				try {
+					while((strLine = br.readLine()) != null) {
+						String[] tokens = strLine.split(",");
+						query = "insert into FLIGHT values(?,?,?,?,?,?,?,?)";
+						PreparedStatement updateStatement = connection.prepareStatement(query);
+						updateStatement.setString(1,tokens[0]);
+						updateStatement.setString(2,tokens[1]);
+						updateStatement.setString(3,tokens[2]);
+						updateStatement.setString(4,tokens[3]);
+						updateStatement.setString(5,tokens[4]); 
+						updateStatement.setString(6,tokens[5]); 
+						updateStatement.setString(7,tokens[6]); 
+						updateStatement.setString(8,tokens[7]); 
+						updateStatement.executeUpdate();
+					}
+				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
+			} catch(IOException e) {System.out.println("FILE NOT FOUND");}	
 		}
 		else if(choice == 4) {
 			System.out.println(
