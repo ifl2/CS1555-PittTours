@@ -311,7 +311,87 @@ public class Menu {
 		} catch(NumberFormatException e) {choice = 0;}
 
 		if(choice == 1) {
-
+			boolean exists = false;
+			// Get basic information
+			System.out.print("Please enter Salutation (Mr/Mrs/Ms): ");
+			String salutation = scan.nextLine();
+			System.out.print("Please enter First Name: ");
+			String first = scan.nextLine();
+			System.out.print("Please enter Last Name: ");
+			String last = scan.nextLine();
+			try {
+				// Check if customer already exists
+				query = "select * from CUSTOMER where first_name = ? and last_name = ?";
+				PreparedStatement updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,first);
+				updateStatement.setString(2,last);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				if(resultSet.next()) {
+					System.out.println("Customer already exists!");
+					exists = true;
+				}
+				if(!exists) { // If name doesn't already exist, continue
+					boolean flag = false;
+					String cid = "";
+					while(!flag) {
+						// Generate random values for cid
+						char[] chars = "0123456789".toCharArray();
+						Random rnd = new Random();
+						StringBuilder sb = new StringBuilder();
+						for (int i = 0; i < 9; i++)
+							sb.append(chars[rnd.nextInt(chars.length)]);
+						cid = sb.toString();
+						// Check if random value for cid already exist in the database
+						query = "select * from CUSTOMER where cid = ?";
+						updateStatement = connection.prepareStatement(query);
+						updateStatement.setString(1,cid);
+						updateStatement.executeUpdate();
+						resultSet = updateStatement.executeQuery(query);
+						// Exits while loop once we obtain a cid that doesn't already exist
+						flag = true;
+						if(resultSet.next())
+							flag = false;
+					}
+					// Get additional info
+					System.out.print("Please enter Street Address: ");
+					String street = scan.nextLine();
+					System.out.print("Please enter City: ");
+					String city = scan.nextLine();
+					System.out.print("Please enter State: ");
+					String state = scan.nextLine();
+					System.out.print("Please enter Phone Number: ");
+					String phone = scan.nextLine();
+					System.out.print("Please enter Email address: ");
+					String email = scan.nextLine();
+					System.out.print("Please enter Credit Card Number: ");
+					String cardNum = scan.nextLine();
+					System.out.print("Please enter Credit Card Expiration Date (MM/YYYY): ");
+					String expire = scan.nextLine();
+					String miles = null;
+					java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
+					java.sql.Date date = null;
+					try { date = new java.sql.Date(df.parse(expire).getTime());
+					} catch(Exception e) {System.out.println("INVALID DATE");}
+					query = "insert into CUSTOMER values(?,?,?,?,?,?,?,?,?,?,?,?)";
+					updateStatement = connection.prepareStatement(query);
+					updateStatement.setString(1,cid);
+					updateStatement.setString(2,salutation);
+					updateStatement.setString(3,first);
+					updateStatement.setString(4,last);
+					updateStatement.setString(5,cardNum);
+					updateStatement.setDate(6,date);
+					updateStatement.setString(7,street);
+					updateStatement.setString(8,city);
+					updateStatement.setString(9,state);
+					updateStatement.setString(10, phone);
+					updateStatement.setString(11, email);
+					updateStatement.setString(12, miles);
+					updateStatement.executeUpdate();
+					System.out.println("Customer successfully added to the database.");
+					System.out.println("PittRewards number: " + cid);
+				}
+			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 2) {
 
