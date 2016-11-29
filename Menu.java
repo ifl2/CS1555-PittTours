@@ -423,7 +423,45 @@ public class Menu {
 			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 3) {
-
+			int highSum1 = 0, lowSum1 = 0, highSum2 = 0, lowSum2 = 0;
+			System.out.print("Please enter City One (3 letter): ");
+			String one = scan.nextLine();
+			System.out.print("Please enter City Two (3 letter): ");
+			String two = scan.nextLine();
+			System.out.println(""); // For formatting
+			try {
+				// City 1 to City 2
+				query = "select high_price, low_price from price where arrival_city = ? and departure_city = ?";
+				PreparedStatement updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,one);
+				updateStatement.setString(2,two);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				while(resultSet.next()) {
+					System.out.println("one + " -> " + two);
+					System.out.println(" High Price: " + resultSet.getString(1) + "\n Low Price: " + resultSet.getString(2));
+					highSum1 = Integer.parseInt(resultSet.getString(1));
+					lowSum1 = Integer.parseInt(resultSet.getString(2));
+				}
+				// City 2 to City 1
+				query = "select high_price, low_price from price where arrival_city = ? and departure_city = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1, two);
+				updateStatement.setString(2, one);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				while(resultSet.next()) {
+					System.out.println("two + " -> " + one);
+					System.out.println(" High Price: " + resultSet.getString(1) + "\n Low Price: " + resultSet.getString(2));
+					highSum2 = Integer.parseInt(resultSet.getString(1));
+					lowSum2 = Integer.parseInt(resultSet.getString(2));
+				}
+				// Round trip
+				System.out.println("Round Trip from " + one + " to " + two + ":");
+				highSum1 = highSum1 + highSum2;
+				lowSum1 = lowSum1 + lowSum2;
+				System.out.println(" High Price: " + highSum1 + "\n Low Price: " + lowSum1 + "\n");
+			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 4) {
 
