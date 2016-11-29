@@ -462,6 +462,34 @@ resultSet = statement.executeQuery(query);
 	     resultSet.getString(3) + "  Departure City: " +
 	     resultSet.getString(4));
       }
+6#
+
+7#
+
+8#
 
 
+9#
 
+System.out.println(" Please enter reservation number");
+String num = scan.nextLine();
+
+query = " SELECT flight_number from detail where reservation_number = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, num);
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+
+if(!(resultSet.next())){
+	System.out.println(" The reservation number was does not exist.");
+}
+else{
+	System.out.println(" Under the reservation " + num + "we have: ");
+      while(resultSet.next())
+      {
+        System.out.println("Flight Number: +
+             resultSet.getString(1));
+
+      }
+}
