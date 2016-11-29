@@ -438,7 +438,7 @@ public class Menu {
 				updateStatement.executeUpdate();
 				resultSet = updateStatement.executeQuery(query);
 				while(resultSet.next()) {
-					System.out.println("one + " -> " + two);
+					System.out.println(one + " -> " + two);
 					System.out.println(" High Price: " + resultSet.getString(1) + "\n Low Price: " + resultSet.getString(2));
 					highSum1 = Integer.parseInt(resultSet.getString(1));
 					lowSum1 = Integer.parseInt(resultSet.getString(2));
@@ -451,7 +451,7 @@ public class Menu {
 				updateStatement.executeUpdate();
 				resultSet = updateStatement.executeQuery(query);
 				while(resultSet.next()) {
-					System.out.println("two + " -> " + one);
+					System.out.println(two + " -> " + one);
 					System.out.println(" High Price: " + resultSet.getString(1) + "\n Low Price: " + resultSet.getString(2));
 					highSum2 = Integer.parseInt(resultSet.getString(1));
 					lowSum2 = Integer.parseInt(resultSet.getString(2));
