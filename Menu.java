@@ -394,7 +394,33 @@ public class Menu {
 			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 2) {
-
+			System.out.print("Please enter Customer First Name: ");
+			String first = scan.nextLine();
+			System.out.print("Please enter Last Name: ");
+			String last = scan.nextLine();
+			try {
+				query = "select * from CUSTOMER where first_name = ? and last_name = ?";
+				PreparedStatement updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,first);
+				updateStatement.setString(2,last);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				while(resultSet.next()) {
+					System.out.println(
+						"\n CID: " + resultSet.getString(1) +
+						"\n Salutation: " + resultSet.getString(2) +
+						"\n First Name: " + resultSet.getString(3) +
+						"\n Last Name: " + resultSet.getString(4) +
+						"\n Credit Card Number: " + resultSet.getString(5) +
+						"\n Credit Card Expiration: " + resultSet.getString(6) +
+						"\n Street address: " + resultSet.getString(7) +
+						"\n City: " + resultSet.getString(8) +
+						"\n State: " + resultSet.getString(9) +
+						"\n Phone Number: " + resultSet.getString(10) +
+						"\n Email: " + resultSet.getString(11) +
+						"\n Frequent Miles: " +resultSet.getString(12) + "\n");
+				}
+			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 3) {
 
