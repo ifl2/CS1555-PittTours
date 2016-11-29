@@ -235,8 +235,34 @@ public class Menu {
 			else
 				System.out.println("INVALID CHOICE");
 		}
-		else if(choice == 5) {
-			// LOAD FILE BY LINE, PARSE BY COMMA, INSERT INTO PLANES
+		else if(choice == 5) { // TESTED & WORKING
+			try {
+				System.out.print("Please enter file name with plane information: ");
+				String filename = scan.nextLine();
+				FileInputStream fstream = new FileInputStream(filename);
+				DataInputStream in = new DataInputStream(fstream);
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				String strLine;
+				try {
+					while((strLine = br.readLine()) != null) {
+						String[] tokens = strLine.split(",");
+						java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
+						java.sql.Date date = null;
+						try { date = new java.sql.Date(df.parse(tokens[3]).getTime());
+						} catch(Exception e) {System.out.println("INVALID DATE");}
+						query = "insert into PLANE values(?,?,?,?,?,?)";
+						PreparedStatement updateStatement = connection.prepareStatement(query);
+						updateStatement.setString(1,tokens[0]);
+						updateStatement.setString(2,tokens[1]);
+						updateStatement.setInt(3,Integer.parseInt(tokens[2]));
+						updateStatement.setDate(4,date);
+						updateStatement.setInt(5,Integer.parseInt(tokens[4]));
+						updateStatement.setString(6,tokens[5]);
+						updateStatement.executeUpdate();
+					}
+					System.out.println("PLANES LOADED");
+				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
+			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
 		else if(choice == 6) {
 			String flightNum, flightDate;
