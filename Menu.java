@@ -38,11 +38,8 @@ public class Menu {
 		System.out.print("Enter menu choice: ");
 		inputString = scan.nextLine();
 		int choice;
-		try {
-			choice = Integer.parseInt(inputString);
-		} catch(NumberFormatException e) {
-			choice = 0;
-		}
+		try { choice = Integer.parseInt(inputString);
+		} catch(NumberFormatException e) {choice = 0;}
 
 		// Handle user input
 		if(choice == 1)
@@ -74,13 +71,10 @@ public class Menu {
 		System.out.print("Enter command number: ");
 		inputString = scan.nextLine();
 		int choice;
-		try {
-			choice = Integer.parseInt(inputString);
-		} catch(NumberFormatException e) {
-			choice = 0;
-		}
+		try { choice = Integer.parseInt(inputString);
+		} catch(NumberFormatException e) {choice = 0;}
 
-		if(choice == 1) { // TESTED & WORKING
+		if(choice == 1) {
 			System.out.print("Are you sure you want to delete the database? (Y/N): ");
 			inputString = scan.nextLine();
 			if(inputString.equals("Y") || inputString.equals("y")) {
@@ -96,11 +90,9 @@ public class Menu {
 					statement.executeQuery("drop table AIRLINE cascade constraints");
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 				System.out.println("DATABASE ERASED");
-			}
-			else
-				System.out.println("DATABASE ERASURE CANCELLED");
+			} else System.out.println("DATABASE ERASURE CANCELLED");
 		}
-		else if(choice == 2) { // TESTED & WORKING
+		else if(choice == 2) {
 			try {
 				System.out.print("Please enter file name with airline information: ");
 				String filename = scan.nextLine();
@@ -123,7 +115,7 @@ public class Menu {
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
-		else if(choice == 3) { // TESTED & WORKING
+		else if(choice == 3) {
 			try {
 				System.out.print("Please enter file name with schedule information: ");
 				String filename = scan.nextLine();
@@ -150,7 +142,7 @@ public class Menu {
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
-		else if(choice == 4) { // TESTED & WORKING
+		else if(choice == 4) {
 			System.out.println(
 				"WOULD YOU LIKE TO:\n" +
 				"L: Load pricing information\n" +
@@ -166,7 +158,7 @@ public class Menu {
 					BufferedReader br = new BufferedReader(new InputStreamReader(in));
 					String strLine;
 					try {
-						while((strLine = br.readLine()) !=null) {
+						while((strLine = br.readLine()) != null) {
 							String[] tokens = strLine.split(",");
 							query = "insert into PRICE values(?,?,?,?,?)";
 							PreparedStatement updateStatement = connection.prepareStatement(query);
@@ -192,18 +184,12 @@ public class Menu {
 				aCity = scan.nextLine();
 				System.out.print("What is the new high price for this flight?: ");
 				inputString = scan.nextLine();
-				try {
-					hPrice = Integer.parseInt(inputString);
-				} catch(NumberFormatException e) {
-					invalidPrice = true;
-				}
+				try { hPrice = Integer.parseInt(inputString);
+				} catch(NumberFormatException e) {invalidPrice = true;}
 				System.out.print("And the low price?: ");
 				inputString = scan.nextLine();
-				try {
-					lPrice = Integer.parseInt(inputString);
-				} catch(NumberFormatException e) {
-					invalidPrice = true;
-				}
+				try { lPrice = Integer.parseInt(inputString);
+				} catch(NumberFormatException e) {invalidPrice = true;}
 				if(!invalidPrice) { // Don't run if price isn't an integer
 					System.out.println( // Display entered data for confirmation before execution
 						"\n You have entered the following information:" +
@@ -213,7 +199,6 @@ public class Menu {
 						"\nLow Price: " + lPrice +
 						"\nIs this this correct? (Y/N)");
 					inputString = scan.nextLine();
-
 					if(inputString.equals("Y") || inputString.equals("y")) {
 						try {
 							query = "UPDATE price SET high_price = ? ,low_price = ? WHERE departure_city = ? AND arrival_city = ?";
@@ -225,17 +210,11 @@ public class Menu {
 							updateStatement.executeUpdate();
 							System.out.println("PRICE CHANGED");
 						} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
-					}
-					else
-						System.out.println("NOTHING CHANGED");
-				}
-				else
-					System.out.println("Price must be a number!");
-			}
-			else
-				System.out.println("INVALID CHOICE");
+					} else System.out.println("NOTHING CHANGED");
+				} else System.out.println("Price must be a number!");
+			} else System.out.println("INVALID CHOICE");
 		}
-		else if(choice == 5) { // TESTED & WORKING
+		else if(choice == 5) {
 			try {
 				System.out.print("Please enter file name with plane information: ");
 				String filename = scan.nextLine();
@@ -264,7 +243,7 @@ public class Menu {
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
-		else if(choice == 6) { // TESTED & WORKING
+		else if(choice == 6) {
 			try {
 				String flightNum, flightDate;
 				System.out.print("Enter flight number: ");
@@ -301,8 +280,7 @@ public class Menu {
 			System.out.println("EXITING");
 			System.exit(0);
 		}
-		else
-			System.out.println("INVALID CHOICE");
+		else System.out.println("INVALID CHOICE");
 
 		// Repeat menu after pause
 		System.out.print("Press Enter to Continue... ");
@@ -329,11 +307,8 @@ public class Menu {
 		System.out.print("Enter command number: ");
 		inputString = scan.nextLine();
 		int choice;
-		try {
-			choice = Integer.parseInt(inputString);
-		} catch(NumberFormatException e) {
-			choice = 0;
-		}
+		try { choice = Integer.parseInt(inputString);
+		} catch(NumberFormatException e) {choice = 0;}
 
 		if(choice == 1) {
 
@@ -369,8 +344,7 @@ public class Menu {
 			System.out.println("EXITING");
 			System.exit(0);
 		}
-		else
-			System.out.println("INVALID CHOICE");
+		else System.out.println("INVALID CHOICE");
 
 		// Repeat menu after pause
 		System.out.print("Press Enter to Continue... ");
