@@ -164,8 +164,8 @@ resultSet = statement.executeQuery(query);
 	  counter ++;
       }
 
-
 1#
+
 System.out.println(" Please enter Salutation (Mr/Mrs/Ms):");
 String salutation = scan.nextLine();
 System.out.println(" Please enter First Name: ");
@@ -178,6 +178,26 @@ PreparedStatement updateStatement = connection.prepareStatement(query);
       updateStatement.setString(1,first);
       updateStatement.setString(2,last);
       updateStatement.executeUpdate();
+resultSet = statement.executeQuery(query);
+      if(resultSet.next()){
+	System.out.println("Customer already exists");
+	break;
+	}
+
+Boolean flag = false;
+while(!flag){
+//Generate random values for cid
+
+//check if random value for cid already exist in the database
+query "SELECT * from customer where cid = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,cid);
+      updateStatement.executeUpdate();
+resultSet = statement.executeQuery(query);
+      if(resultSet.next()){
+	flag = true;
+	}
+}
 
 System.out.println(" Please enter Street address: ");
 String street = scan.nextLine();
@@ -194,10 +214,7 @@ String cardNum = scan.nextLine();
 System.out.println(" Please enter Credit Card Expiration date: ");
 String expire = scan.nextLine();
 
-
-
-
-
+String miles = null;
 
 query = "INSERT INTO customer VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 PreparedStatement updateStatement = connection.prepareStatement(query);
@@ -215,4 +232,6 @@ PreparedStatement updateStatement = connection.prepareStatement(query);
       updateStatement.setString(12, miles);
       updateStatement.executeUpdate();
 
+System.out.println("Customer added with success to the database");
+System.out.println("PittRewards number: " + cid);
 
