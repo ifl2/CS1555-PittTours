@@ -154,7 +154,7 @@ PreparedStatement updateStatement = connection.prepareStatement(query);
       updateStatement.executeUpdate();
 
 resultSet = statement.executeQuery(query);
-	counter=1;
+	int counter=1;
       while(resultSet.next())
       {
         System.out.println("Passenger " + counter + ": " +
@@ -314,4 +314,29 @@ resultSet = statement.executeQuery(query);
 	lowSum1= lowSum1+lowSum2;
 	System.out.println(" High Price: " + highSum1 + "\n Low Price: " + lowSum1);
 
+4# //I am not sure how to get the trips with connection. For now I only have the one way trip with no connections.
 
+System.out.println(" Please enter Departure City(3 letter)");
+String depart = scan.nextLine();
+System.out.println(" Please enter Arrival City(3 letter)");
+String arrive = scan.nextLine();
+
+query = "SELECT flight_number, departure_time, arrival_time FROM flight WHERE departure_city = ? AND arrival_city = ?"
+
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, depart);
+      updateStatement.setString(2, arrive);     
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+      
+      System.out.println("All routes between " + depart + " -> " arrive);
+      int counter = 1;
+      while(resultSet.next())
+      {
+	System.out.println("Route " + counter + ": ");
+	System.out.println(" Flight number: " +
+             resultSet.getString(1) + "  Departure Time: " +
+	     resultSet.getString(2) + "  Arrival Time: " +
+	     resultSet.getString(3));
+      }
