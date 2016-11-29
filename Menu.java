@@ -7,8 +7,8 @@ public class Menu {
 	private static Connection connection;
 	private Statement statement;
 	private ResultSet resultSet;
-	private String inputString, file, query;
 	private Scanner scan = new Scanner(System.in);
+	private String inputString, query;
 
 	// CONNECT TO THE DATABASE
 	public void connectDB() {
@@ -33,14 +33,14 @@ public class Menu {
 		System.out.println("1: Administrator");
 		System.out.println("2: Customer");
 		System.out.println("3: Neither, Quit\n");
-		
+
 		// Get user input
 		System.out.print("Enter menu choice: ");
 		inputString = scan.nextLine();
 		int choice;
 		try {
 			choice = Integer.parseInt(inputString);
-		} catch (NumberFormatException e) {
+		} catch(NumberFormatException e) {
 			choice = 0;
 		}
 
@@ -50,7 +50,7 @@ public class Menu {
 		else if(choice == 2)
 			displayCusInterface();
 		else if(choice == 3) {
-			System.out.println("\nEXITING");
+			System.out.println("EXITING");
 			System.exit(0);
 		}
 		else { // If invalid choice, recall method
@@ -76,11 +76,11 @@ public class Menu {
 		int choice;
 		try {
 			choice = Integer.parseInt(inputString);
-		} catch (NumberFormatException e) {
+		} catch(NumberFormatException e) {
 			choice = 0;
 		}
 
-		if(choice == 1) {
+		if(choice == 1) { // TESTED & WORKING
 			System.out.print("Are you sure you want to delete the database? (Y/N): ");
 			inputString = scan.nextLine();
 			if(inputString.equals("Y") || inputString.equals("y")) {
@@ -100,8 +100,27 @@ public class Menu {
 			else
 				System.out.println("DATABASE ERASURE CANCELLED");
 		}
-		else if(choice == 2) {
-			// LOAD FILE BY LINE, PARSE BY COMMA, INSERT INTO AIRLINES
+		else if(choice == 2) { // TESTED & WORKING
+			try {
+				System.out.print("Please enter file name with airline information: ");
+				String filename = scan.nextLine();
+				FileInputStream fstream = new FileInputStream(filename);
+				DataInputStream in = new DataInputStream(fstream);
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				String strLine;
+				try {
+					while((strLine = br.readLine()) != null) {
+						String[] tokens = strLine.split(",");
+						query = "insert into AIRLINE values(?,?,?,?)";
+						PreparedStatement updateStatement = connection.prepareStatement(query);
+						updateStatement.setString(1, tokens[0]);
+						updateStatement.setString(2, tokens[1]);
+						updateStatement.setString(3, tokens[2]);
+						updateStatement.setInt(4, Integer.parseInt(tokens[3]));
+						updateStatement.executeUpdate();
+					}
+				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
+			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
 		else if(choice == 3) {
 			// LOAD FILE BY LINE, PARSE BY COMMA, INSERT INTO FLIGHTS
@@ -157,7 +176,7 @@ public class Menu {
 			flightDate = scan.nextLine();
 		}
 		else if(choice == 7) {
-			System.out.println("\nEXITING");
+			System.out.println("EXITING");
 			System.exit(0);
 		}
 		else
@@ -190,7 +209,7 @@ public class Menu {
 		int choice;
 		try {
 			choice = Integer.parseInt(inputString);
-		} catch (NumberFormatException e) {
+		} catch(NumberFormatException e) {
 			choice = 0;
 		}
 
@@ -225,7 +244,7 @@ public class Menu {
 
 		}
 		else if(choice == 11) {
-			System.out.println("\nEXITING");
+			System.out.println("EXITING");
 			System.exit(0);
 		}
 		else
