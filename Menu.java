@@ -113,12 +113,13 @@ public class Menu {
 						String[] tokens = strLine.split(",");
 						query = "insert into AIRLINE values(?,?,?,?)";
 						PreparedStatement updateStatement = connection.prepareStatement(query);
-						updateStatement.setString(1, tokens[0]);
-						updateStatement.setString(2, tokens[1]);
-						updateStatement.setString(3, tokens[2]);
-						updateStatement.setInt(4, Integer.parseInt(tokens[3]));
+						updateStatement.setString(1,tokens[0]);
+						updateStatement.setString(2,tokens[1]);
+						updateStatement.setString(3,tokens[2]);
+						updateStatement.setInt(4,Integer.parseInt(tokens[3]));
 						updateStatement.executeUpdate();
 					}
+					System.out.println("AIRLINES LOADED");
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
@@ -139,16 +140,17 @@ public class Menu {
 						updateStatement.setString(2,tokens[1]);
 						updateStatement.setString(3,tokens[2]);
 						updateStatement.setString(4,tokens[3]);
-						updateStatement.setString(5,tokens[4]); 
-						updateStatement.setString(6,tokens[5]); 
-						updateStatement.setString(7,tokens[6]); 
-						updateStatement.setString(8,tokens[7]); 
+						updateStatement.setString(5,tokens[4]);
+						updateStatement.setString(6,tokens[5]);
+						updateStatement.setString(7,tokens[6]);
+						updateStatement.setString(8,tokens[7]);
 						updateStatement.executeUpdate();
 					}
+					System.out.println("SCHEDULES LOADED");
 				} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
-			} catch(IOException e) {System.out.println("FILE NOT FOUND");}	
+			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
-		else if(choice == 4) {
+		else if(choice == 4) { // TESTED & WORKING
 			System.out.println(
 				"WOULD YOU LIKE TO:\n" +
 				"L: Load pricing information\n" +
@@ -156,34 +158,79 @@ public class Menu {
 			System.out.print("Enter Command: ");
 			inputString = scan.nextLine();
 			if(inputString.equals("L") || inputString.equals("l")) {
-				// LOAD FILE BY LINE, PARSE BY COMMA, INSERT INTO PRICES
+				try {
+					System.out.print("Please enter file name with pricing information: ");
+					String filename = scan.nextLine();
+					FileInputStream fstream = new FileInputStream(filename);
+					DataInputStream in = new DataInputStream(fstream);
+					BufferedReader br = new BufferedReader(new InputStreamReader(in));
+					String strLine;
+					try {
+						while((strLine = br.readLine()) !=null) {
+							String[] tokens = strLine.split(",");
+							query = "insert into PRICE values(?,?,?,?,?)";
+							PreparedStatement updateStatement = connection.prepareStatement(query);
+							updateStatement.setString(1,tokens[0]);
+							updateStatement.setString(2,tokens[1]);
+							updateStatement.setString(3,tokens[2]);
+							updateStatement.setInt(4,Integer.parseInt(tokens[3]));
+							updateStatement.setInt(5,Integer.parseInt(tokens[4]));
+							updateStatement.executeUpdate();
+						}
+						System.out.println("PRICES LOADED");
+					} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
+				} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 			}
 			else if(inputString.equals("C") || inputString.equals("c")) {
-				String dCity, aCity, hPrice, lPrice;
+				String dCity, aCity;
+				int hPrice = 0, lPrice = 0;
+				boolean invalidPrice = false;
 				System.out.println("YOU HAVE CHOSEN TO CHANGE A FLIGHT PRICE");
 				System.out.print("What is the departure city of the flight you wish to change?: ");
 				dCity = scan.nextLine();
 				System.out.print("And the arrival city of this flight?: ");
 				aCity = scan.nextLine();
 				System.out.print("What is the new high price for this flight?: ");
-				hPrice = scan.nextLine();
-				System.out.print("And the low price?: ");
-				lPrice = scan.nextLine();
-				System.out.println(
-					"\n You have entered the following information:" +
-					"\nDeparture City: " + dCity +
-					"\nArrival City: " + aCity +
-					"\nHigh Price: " + hPrice +
-					"\nLow Price: " + lPrice +
-					"\nIs this this correct? (Y/N)\n");
 				inputString = scan.nextLine();
+				try {
+					hPrice = Integer.parseInt(inputString);
+				} catch(NumberFormatException e) {
+					invalidPrice = true;
+				}
+				System.out.print("And the low price?: ");
+				inputString = scan.nextLine();
+				try {
+					lPrice = Integer.parseInt(inputString);
+				} catch(NumberFormatException e) {
+					invalidPrice = true;
+				}
+				if(!invalidPrice) { // Don't run if price isn't an integer
+					System.out.println( // Display entered data for confirmation before execution
+						"\n You have entered the following information:" +
+						"\nDeparture City: " + dCity +
+						"\nArrival City: " + aCity +
+						"\nHigh Price: " + hPrice +
+						"\nLow Price: " + lPrice +
+						"\nIs this this correct? (Y/N)");
+					inputString = scan.nextLine();
 
-				if(inputString.equals("Y") || inputString.equals("y")) {
-					// UPDATE WITH PRICE THAT HAS THE ABOVE INFORMATION
-					System.out.println("PRICE CHANGED");
+					if(inputString.equals("Y") || inputString.equals("y")) {
+						try {
+							query = "UPDATE price SET high_price = ? ,low_price = ? WHERE departure_city = ? AND arrival_city = ?";
+							PreparedStatement updateStatement = connection.prepareStatement(query);
+							updateStatement.setInt(1,hPrice);
+							updateStatement.setInt(2,lPrice);
+							updateStatement.setString(3,dCity);
+							updateStatement.setString(4,aCity);
+							updateStatement.executeUpdate();
+							System.out.println("PRICE CHANGED");
+						} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
+					}
+					else
+						System.out.println("NOTHING CHANGED");
 				}
 				else
-					System.out.println("NOTHING CHANGED");
+					System.out.println("Price must be a number!");
 			}
 			else
 				System.out.println("INVALID CHOICE");
