@@ -265,6 +265,53 @@ resultSet = statement.executeQuery(query);
              resultSet.getString(11) + "\n Frequent Miles: " +
              resultSet.getString(12));
       }
+      
+3#
 
+System.out.println(" Please enter City one (3 letter)");
+String one = scan.nextLine();
+System.out.println(" Please enter City two (3 letter)");
+String two = scan.nextLine();
+
+//city 1 to city 2
+query = "SELECT high_price, low_price FROM price WHERE arrival_city = ? AND departure_city = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, one);
+      updateStatement.setString(2, two);     
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+      while(resultSet.next())
+      {
+	System.out.println(one + " -> " two);
+	System.out.println(" High Price: " +
+             resultSet.getString(1) + "\n Low Price: " +
+	     resultSet.getString(2));
+	int highSum1 = Integer.paserInt(resultSet.getString(1))
+	int lowSum1 = Integer.parserInt(resultSet.getString(2))
+      }
+//City 2 to city 1
+query = "SELECT high_price, low_price FROM price WHERE arrival_city = ? AND departure_city = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, two);
+      updateStatement.setString(2, one);     
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+      while(resultSet.next())
+      {
+	System.out.println(two + " -> " one);
+	System.out.println(" High Price: " +
+             resultSet.getString(1) + "\n Low Price: " +
+	     resultSet.getString(2));
+	int highSum2 = Integer.paserInt(resultSet.getString(1))
+	int lowSum2= Integer.parserInt(resultSet.getString(2))
+      }
+
+//Round trip
+	System.out.println("Round Trip from " + one + " to " + two");
+	highSum1= highSum1+highSum2;
+	lowSum1= lowSum1+lowSum2;
+	System.out.println(" High Price: " + highSum1 + "\n Low Price: " + lowSum1);
 
 
