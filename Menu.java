@@ -10,6 +10,7 @@ public class Menu {
 	private Scanner scan = new Scanner(System.in);
 	private String inputString, query;
 	private int choice;
+	private boolean exit;
 
 	// CONNECT TO THE DATABASE
 	public void connectDB() {
@@ -26,7 +27,7 @@ public class Menu {
 			System.out.println("Error connecting to database.  Machine Error: " + Ex.toString());
 			Ex.printStackTrace();
 			System.out.println("CONNECTION REQUIRED: EXITING");
-			System.exit(0);
+			System.exit(0); // No need to make sure connection is closed since it wasn't made
 		}
 	}
 
@@ -48,10 +49,7 @@ public class Menu {
 			displayAdmInterface();
 		else if(choice == 2)
 			displayCusInterface();
-		else if(choice == 3) {
-			System.out.println("EXITING");
-			System.exit(0);
-		}
+		else if(choice == 3) {} // Simply drops back to main to properly exit
 		else { // If invalid choice, recall method
 			System.out.println("INVALID CHOICE");
 			getAccess();
@@ -156,16 +154,15 @@ public class Menu {
 			flightDate = scan.nextLine();
 			adm6(flightNum, flightDate);
 		}
-		else if(choice == 7) {
-			System.out.println("EXITING");
-			System.exit(0);
-		}
+		else if(choice == 7) exit = true;
 		else System.out.println("INVALID CHOICE");
 
-		// Repeat menu after user controlled pause
-		System.out.print("Press Enter to Continue... ");
-		inputString = scan.nextLine();
-		displayAdmInterface();
+		if(!exit) { // Exiting will ignore loop and drop to main to exit properly
+			// Repeat menu after user controlled pause
+			System.out.print("Press Enter to Continue... ");
+			inputString = scan.nextLine();
+			displayAdmInterface();
+		}
 	}
 
 	// CUSTOMER INTERFACE
@@ -275,7 +272,7 @@ public class Menu {
 			String airline = scan.nextLine();
 			cus7(depart, arrive, airline);
 		}
-		else if(choice == 8) { // WORK IN PROGRESS
+		else if(choice == 8) {
 			String flightN1 = null, flightN2 = null, flightN3 = null, flightN4 = null;
 			String dateN1 = null, dateN2 = null, dateN3 = null, dateN4 = null;
 			// Get user input
@@ -311,27 +308,24 @@ public class Menu {
 			cus8(flightN1, flightN2, flightN3, flightN4, dateN1, dateN2, dateN3, dateN4);
 		}
 		else if(choice == 9) {
-			// Get user input
 			System.out.print("Please enter reservation number: ");
 			String num = scan.nextLine();
 			cus9(num);
 		}
 		else if(choice == 10) {
-			// Get user input
 			System.out.print("Please enter reservation number: ");
 			String num = scan.nextLine();
 			cus10(num);
 		}
-		else if(choice == 11) {
-			System.out.println("EXITING");
-			System.exit(0);
-		}
+		else if(choice == 11) exit = true;
 		else System.out.println("INVALID CHOICE");
 
-		// Repeat menu after user controlled pause
-		System.out.print("Press Enter to Continue... ");
-		inputString = scan.nextLine();
-		displayCusInterface();
+		if(!exit) { // Exiting will ignore loop and drop to main to exit properly
+			// Repeat menu after user controlled pause
+			System.out.print("Press Enter to Continue... ");
+			inputString = scan.nextLine();
+			displayCusInterface();
+		}
 	}
 
 	// Administrator Command #1
@@ -500,17 +494,8 @@ public class Menu {
 	// Customer Command #1
 	public void cus1(String... inputs) {
 		// Store inputs
-		String salutation = inputs[0];
-		String first = inputs[1];
-		String last = inputs[2];
-		String street = inputs[3];
-		String city = inputs[4];
-		String state = inputs[5];
-		String phone = inputs[6];
-		String email = inputs[7];
-		String cardNum = inputs[8];
-		String expire = inputs[9];
-		String miles = null;
+		String salutation = inputs[0], first = inputs[1], last = inputs[2], street = inputs[3], city = inputs[4],
+			state = inputs[5], phone = inputs[6], email = inputs[7], cardNum = inputs[8], expire = inputs[9], miles = null;
 		// Convert Date
 		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
 		java.sql.Date date = null;
@@ -877,40 +862,22 @@ public class Menu {
 
 	// Customer Command #8 - WORK IN PROGRESS
 	public void cus8(String... inputs) {
-		// Assign inputs
-		String flightN1 = inputs[0];
-		String flightN2 = inputs[1];
-		String flightN3 = inputs[2];
-		String flightN4 = inputs[3];
-		String dateN1 = inputs[4];
-		String dateN2 = inputs[5];
-		String dateN3 = inputs[6];
-		String dateN4 = inputs[7];
-		// Convert dates
-		java.sql.Date date1 = null;
-		if(dateN1 != null) {
-			java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
-			try { date1 = new java.sql.Date(df.parse(dateN1).getTime());
-			} catch(Exception e) {System.out.println("INVALID DATE");}
-		}
-		java.sql.Date date2 = null;
-		if(dateN2 != null) {
-			java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
-			try { date2 = new java.sql.Date(df.parse(dateN2).getTime());
-			} catch(Exception e) {System.out.println("INVALID DATE");}
-		}
-		java.sql.Date date3 = null;
-		if(dateN3 != null) {
-			java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
-			try { date3 = new java.sql.Date(df.parse(dateN3).getTime());
-			} catch(Exception e) {System.out.println("INVALID DATE");}
-		}
-		java.sql.Date date4 = null;
-		if(dateN4 != null) {
-			java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
-			try { date4 = new java.sql.Date(df.parse(dateN4).getTime());
-			} catch(Exception e) {System.out.println("INVALID DATE");}
-		}
+		// Store inputs
+		String flightN1 = inputs[0], flightN2 = inputs[1], flightN3 = inputs[2], flightN4 = inputs[3];
+		String dateN1 = inputs[4], dateN2 = inputs[5], dateN3 = inputs[6], dateN4 = inputs[7];
+		// Convert dates if they aren't null
+		java.sql.Date date1 = null, date2 = null, date3 = null, date4 = null;
+		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
+		try {
+			if(dateN1 != null)
+				date1 = new java.sql.Date(df.parse(dateN1).getTime());
+			if(dateN2 != null)
+				date2 = new java.sql.Date(df.parse(dateN2).getTime());
+			if(dateN3 != null)
+				date3 = new java.sql.Date(df.parse(dateN3).getTime());
+			if(dateN4 != null)
+				date4 = new java.sql.Date(df.parse(dateN4).getTime());
+		} catch(Exception e) {System.out.println("INVALID DATE");}
 		/*
 		try {
 			// Make reservation, check if values are null to see if a leg is to be added
@@ -949,11 +916,17 @@ public class Menu {
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
+
 	// Main
 	public static void main(String args[]) throws SQLException {
+		// Connect to the Database
 		Menu menu = new Menu();
-		menu.connectDB(); // Connect to the Database
-		menu.getAccess(); // Determine Admin or Customer access, then run interface
-		connection.close(); // Close connection (needs added before system.exits?)
+		menu.connectDB();
+		// Determine Admin or Customer access, then run interface
+		menu.getAccess();
+		// If exit option is selected, will drop out of interface and continue below
+		connection.close();
+		System.out.println("EXITING");
+		System.exit(0);
 	}
 }
