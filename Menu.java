@@ -754,8 +754,40 @@ public class Menu {
 				}
 			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
-		else if(choice == 8) {
-
+		else if(choice == 8) { // WORK IN PROGRESS
+			String flightN1, flightN2, flightN3, flightN4, dateN1, dateN2, dateN3, dateN4;
+			// Get user input
+			System.out.println("ADDING RESERVATION:\nAdd first flight:");
+			System.out.print(" Flight Number: ");
+			flightN1 = scan.nextLine();
+			System.out.print(" Departure Date: ");
+			dateN1 = scan.nextLine();
+			System.out.print("\nAdd another leg in this direction? (Y/N): ");
+			inputString = scan.nextLine();
+			if(inputString.equals("Y") || inputString.equals("y")) {
+				System.out.print(" Flight Number: ");
+				flightN2 = scan.nextLine();
+				System.out.print(" Departure Date: ");
+				dateN2 = scan.nextLine();
+			}
+			System.out.print("\nAdd return trip? (Y/N): ");
+			inputString = scan.nextLine();
+			if(inputString.equals("Y") || inputString.equals("y")) {
+				System.out.print(" Flight Number: ");
+				flightN3 = scan.nextLine();
+				System.out.print(" Departure Date: ");
+				dateN3 = scan.nextLine();
+			}
+			System.out.print("\nAdd another leg in this direction? (Y/N): ");
+			inputString = scan.nextLine();
+			if(inputString.equals("Y") || inputString.equals("y")) {
+				System.out.print(" Flight Number: ");
+				flightN4 = scan.nextLine();
+				System.out.print(" Departure Date: ");
+				dateN4 = scan.nextLine();
+			}
+			// DO THINGS
+			System.out.println("FLIGHT ADDED");
 		}
 		else if(choice == 9) {
 			// Get user input
