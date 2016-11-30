@@ -1,3 +1,34 @@
+/* METHOD SYNTAX FOR DRIVER
+	ADMIN COMMANDS
+		adm1();
+		adm2(filename);
+		adm3(filename);
+		adm4L(filename):
+		adm4C(departure_city, arrival_city, high_price, low_price);
+		adm5(filename);
+		adm6(flight_number, flight_date);
+			flight_date -> date format: MM/DD/YYYY
+	CUSTOMER COMMANDS
+		cus1(salutation, first_name, last_name, street, city, state, phone, email, credit_card_num, credit_card_expire);
+			salutation -> Mr/Mrs/Ms
+			state -> 2 letter abbreviation
+			credit_card_expire -> date format: MM/YYYY
+		cus2(first_name, last_name);
+		cus3(city_one, city_two);
+		cus4(departure_city, arrival_city);
+		cus5(departure_city, arrival_city, airline_name);
+		cus6(departure_city, arrival_city);
+		cus7(departure_city, arrival_city, airline_name);
+		cus8(flight_num_1, flight_num_2, flight_num_3, flight_num_4, date_1, date_1, date_3, date_4);
+			flight_num_1 -> leg one away (required)
+			flight_num_2 -> leg two away (optional)
+			flight_num_3 -> leg one return (optional)
+			flight_num_3 -> leg two return (optional, flight_num_3 required)
+			date_# -> date of corresponding flight number (date format: MM/DD/YYYY)
+		cus9(reservation_number);
+		cus10(reservation_number)
+*/
+
 import java.sql.*;
 import java.util.*;
 import java.io.*;
@@ -12,7 +43,10 @@ public class Menu {
 	private int choice;
 	private boolean exit;
 
-	// CONNECT TO THE DATABASE
+	//////////////////////////////////////////////////////////////
+	//  CONNECTION TO DATABASE : makes necessary db connection  //
+	//////////////////////////////////////////////////////////////
+
 	public void connectDB() {
 		System.out.println("CONNECTING TO DB");
 		System.out.print("Username: ");
@@ -26,13 +60,17 @@ public class Menu {
 		} catch(Exception Ex) {
 			System.out.println("Error connecting to database.  Machine Error: " + Ex.toString());
 			Ex.printStackTrace();
-			System.out.println("CONNECTION REQUIRED: EXITING");
+			System.out.println("\nCONNECTION IS REQUIRED: EXITING");
 			System.exit(0); // No need to make sure connection is closed since it wasn't made
 		}
 	}
 
-	// GET ACCESS TYPE (ADMINISTRATOR/CUSTOMER)
+	/////////////////////////////////////////////////////
+	//  ACCESS TYPE : gets admin/customer access type  //
+	/////////////////////////////////////////////////////
+
 	public void getAccess() {
+		// Display menu options
 		System.out.println("\nWelcome to PittTours are you a: ");
 		System.out.println("1: Administrator");
 		System.out.println("2: Customer");
@@ -41,10 +79,11 @@ public class Menu {
 		// Get user input
 		System.out.print("Enter menu choice: ");
 		inputString = scan.nextLine();
+		// Convert input to integer, if not convertable, set to 0 (invalid)
 		try { choice = Integer.parseInt(inputString);
 		} catch(NumberFormatException e) {choice = 0;}
 
-		// Handle user input
+		// Handle user choices
 		if(choice == 1)
 			displayAdmInterface();
 		else if(choice == 2)
@@ -56,8 +95,12 @@ public class Menu {
 		}
 	}
 
-	// ADMINISTRATOR INTERFACE
+	///////////////////////////////////////////////////////////
+	//  ADMINISTRATOR INTERFACE : handles all admin queries  //
+	///////////////////////////////////////////////////////////
+
 	public void displayAdmInterface() {
+		// Display menu options
 		System.out.println("\nAVAILABLE ADMINISTRATOR COMMANDS:");
 		System.out.println("1: Erase the Database");
 		System.out.println("2: Load airline information");
@@ -70,9 +113,11 @@ public class Menu {
 		// Get user input
 		System.out.print("Enter command number: ");
 		inputString = scan.nextLine();
+		// Convert input to integer, if not convertable, set to 0 (invalid)
 		try { choice = Integer.parseInt(inputString);
 		} catch(NumberFormatException e) {choice = 0;}
 
+		// Handle user choices
 		if(choice == 1) {
 			// Get user verification
 			System.out.print("Are you sure you want to delete the database? (Y/N): ");
@@ -93,23 +138,22 @@ public class Menu {
 			adm3(filename);
 		}
 		else if(choice == 4) {
+			// Display menu options
 			System.out.println(
 				"WOULD YOU LIKE TO:\n" +
 				"L: Load pricing information\n" +
 				"C: Change flight price\n");
 			System.out.print("Enter Command: ");
 			inputString = scan.nextLine();
-			// If load pricing information option was selected
+			// If load pricing information option was selected (L)
 			if(inputString.equals("L") || inputString.equals("l")) {
 				System.out.print("Please enter file name with pricing information: ");
 				String filename = scan.nextLine();
 				adm4L(filename);
 			}
-			// If change flight pricing information was selected
+			// If change flight pricing information was selected (C)
 			else if(inputString.equals("C") || inputString.equals("c")) {
 				String dCity, aCity;
-				int hPrice = 0, lPrice = 0;
-				boolean invalidPrice = false;
 				System.out.println("YOU HAVE CHOSEN TO CHANGE A FLIGHT PRICE");
 				System.out.print("What is the departure city of the flight you wish to change?: ");
 				dCity = scan.nextLine();
@@ -117,13 +161,15 @@ public class Menu {
 				aCity = scan.nextLine();
 				System.out.print("What is the new high price for this flight?: ");
 				inputString = scan.nextLine();
+				int hPrice = 0, lPrice = 0;
+				boolean invalidPrice = false;
 				try { hPrice = Integer.parseInt(inputString);
 				} catch(NumberFormatException e) {invalidPrice = true;}
 				System.out.print("And the low price?: ");
 				inputString = scan.nextLine();
 				try { lPrice = Integer.parseInt(inputString);
 				} catch(NumberFormatException e) {invalidPrice = true;}
-				if(!invalidPrice) { // Don't run if price isn't an integer
+				if(!invalidPrice) { // Continue only if price is valid
 					System.out.println( // Display entered data for confirmation before execution
 						"\n You have entered the following information:" +
 						"\nDeparture City: " + dCity +
@@ -132,7 +178,7 @@ public class Menu {
 						"\nLow Price: " + lPrice +
 						"\nIs this this correct? (Y/N)");
 					inputString = scan.nextLine();
-					// If input data is confirmed
+					// If input data is confirmed, execute
 					if(inputString.equals("Y") || inputString.equals("y"))
 						adm4C(dCity, aCity, hPrice, lPrice);
 					else System.out.println("NOTHING CHANGED");
@@ -140,13 +186,11 @@ public class Menu {
 			} else System.out.println("INVALID CHOICE");
 		}
 		else if(choice == 5) {
-			// Get user input
 			System.out.print("Please enter file name with plane information: ");
 			String filename = scan.nextLine();
 			adm5(filename);
 		}
 		else if(choice == 6) {
-			// Get user input
 			String flightNum, flightDate;
 			System.out.print("Enter flight number: ");
 			flightNum = scan.nextLine();
@@ -165,8 +209,12 @@ public class Menu {
 		}
 	}
 
-	// CUSTOMER INTERFACE
+	/////////////////////////////////////////////////////////
+	//  CUSTOMER INTERFACE : handles all customer queries  //
+	/////////////////////////////////////////////////////////
+
 	private void displayCusInterface() {
+		// Display menu options
 		System.out.println("\nAVAILABLE CUSTOMER COMMANDS:");
 		System.out.println("1: Add customer");
 		System.out.println("2: Show customer info, given customer name");
@@ -183,9 +231,11 @@ public class Menu {
 		// Get user input
 		System.out.print("Enter command number: ");
 		inputString = scan.nextLine();
+		// Convert input to integer, if not convertable, set to 0 (invalid)
 		try { choice = Integer.parseInt(inputString);
 		} catch(NumberFormatException e) {choice = 0;}
 
+		// Handle user choices
 		if(choice == 1) {
 			System.out.print("Please enter Salutation (Mr/Mrs/Ms): ");
 			String salutation = scan.nextLine();
@@ -228,7 +278,6 @@ public class Menu {
 			cus2(first, last);
 		}
 		else if(choice == 3) {
-			// Get user input
 			System.out.print("Please enter City One (3 letter): ");
 			String one = scan.nextLine();
 			System.out.print("Please enter City Two (3 letter): ");
@@ -237,7 +286,6 @@ public class Menu {
 			cus3(one, two);
 		}
 		else if(choice == 4) {
-			// Get user input
 			System.out.print("Please enter Departure City (3 letter): ");
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
@@ -245,7 +293,6 @@ public class Menu {
 			cus4(depart, arrive);
 		}
 		else if(choice == 5) {
-			// Get user input
 			System.out.print("Please enter Departure City (3 letter): ");
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
@@ -255,7 +302,6 @@ public class Menu {
 			cus5(depart, arrive, airline);
 		}
 		else if(choice == 6) {
-			// Get user input
 			System.out.print("Please enter Departure City (3 letter): ");
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
@@ -263,7 +309,6 @@ public class Menu {
 			cus6(depart, arrive);
 		}
 		else if(choice == 7) {
-			// Get user input
 			System.out.print("Please enter Departure City (3 letter): ");
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
@@ -275,35 +320,38 @@ public class Menu {
 		else if(choice == 8) {
 			String flightN1 = null, flightN2 = null, flightN3 = null, flightN4 = null;
 			String dateN1 = null, dateN2 = null, dateN3 = null, dateN4 = null;
-			// Get user input
 			System.out.println("ADDING RESERVATION:\nAdd first flight:");
+			// Get first leg (required)
 			System.out.print(" Flight Number: ");
 			flightN1 = scan.nextLine();
-			System.out.print(" Departure Date: ");
+			System.out.print(" Departure Date (MM/DD/YYYY): ");
 			dateN1 = scan.nextLine();
+			// Get second leg (optional)
 			System.out.print("\nAdd another leg in this direction? (Y/N): ");
 			inputString = scan.nextLine();
 			if(inputString.equals("Y") || inputString.equals("y")) {
 				System.out.print(" Flight Number: ");
 				flightN2 = scan.nextLine();
-				System.out.print(" Departure Date: ");
+				System.out.print(" Departure Date (MM/DD/YYYY): ");
 				dateN2 = scan.nextLine();
 			}
+			// Get return trip first leg (optional)
 			System.out.print("\nAdd return trip? (Y/N): ");
 			inputString = scan.nextLine();
 			if(inputString.equals("Y") || inputString.equals("y")) {
 				System.out.print(" Flight Number: ");
 				flightN3 = scan.nextLine();
-				System.out.print(" Departure Date: ");
+				System.out.print(" Departure Date (MM/DD/YYYY): ");
 				dateN3 = scan.nextLine();
-			}
-			System.out.print("\nAdd another leg in this direction? (Y/N): ");
-			inputString = scan.nextLine();
-			if(inputString.equals("Y") || inputString.equals("y")) {
-				System.out.print(" Flight Number: ");
-				flightN4 = scan.nextLine();
-				System.out.print(" Departure Date: ");
-				dateN4 = scan.nextLine();
+				// Get return trip second leg (optional, requires return trip first leg)
+				System.out.print("\nAdd another leg in this direction? (Y/N): ");
+				inputString = scan.nextLine();
+				if(inputString.equals("Y") || inputString.equals("y")) {
+					System.out.print(" Flight Number: ");
+					flightN4 = scan.nextLine();
+					System.out.print(" Departure Date (MM/DD/YYYY): ");
+					dateN4 = scan.nextLine();
+				}
 			}
 			cus8(flightN1, flightN2, flightN3, flightN4, dateN1, dateN2, dateN3, dateN4);
 		}
@@ -327,6 +375,10 @@ public class Menu {
 			displayCusInterface();
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////
+	//  METHODS : can be run from driver, contains no user queries  //
+	//////////////////////////////////////////////////////////////////
 
 	// Administrator Command #1
 	public void adm1() {
@@ -916,8 +968,10 @@ public class Menu {
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
+	///////////////////////////////////////////////////////
+	//  MAIN : handles primary method calls and exiting  //
+	///////////////////////////////////////////////////////
 
-	// Main
 	public static void main(String args[]) throws SQLException {
 		// Connect to the Database
 		Menu menu = new Menu();
@@ -930,3 +984,4 @@ public class Menu {
 		System.exit(0);
 	}
 }
+//EOF
