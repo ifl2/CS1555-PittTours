@@ -75,10 +75,13 @@ public class Menu {
 		} catch(NumberFormatException e) {choice = 0;}
 
 		if(choice == 1) {
+			// Get user verification
 			System.out.print("Are you sure you want to delete the database? (Y/N): ");
 			inputString = scan.nextLine();
+			// If user verifies database deletion
 			if(inputString.equals("Y") || inputString.equals("y")) {
 				try {
+					// Drop all tables
 					statement = connection.createStatement();
 					statement.executeQuery("drop table PLANE cascade constraints");
 					statement.executeQuery("drop table FLIGHT cascade constraints");
@@ -93,14 +96,17 @@ public class Menu {
 			} else System.out.println("DATABASE ERASURE CANCELLED");
 		}
 		else if(choice == 2) {
+			// Get user input
+			System.out.print("Please enter file name with airline information: ");
+			String filename = scan.nextLine();
 			try {
-				System.out.print("Please enter file name with airline information: ");
-				String filename = scan.nextLine();
+				// Read from file
 				FileInputStream fstream = new FileInputStream(filename);
 				DataInputStream in = new DataInputStream(fstream);
 				BufferedReader br = new BufferedReader(new InputStreamReader(in));
 				String strLine;
 				try {
+					// Insert into airline table
 					while((strLine = br.readLine()) != null) {
 						String[] tokens = strLine.split(",");
 						query = "insert into AIRLINE values(?,?,?,?)";
@@ -116,14 +122,17 @@ public class Menu {
 			} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 		}
 		else if(choice == 3) {
+			// Get user input
+			System.out.print("Please enter file name with schedule information: ");
+			String filename = scan.nextLine();
 			try {
-				System.out.print("Please enter file name with schedule information: ");
-				String filename = scan.nextLine();
+				// Read from file
 				FileInputStream fstream = new FileInputStream(filename);
 				DataInputStream in = new DataInputStream(fstream);
 				BufferedReader br = new BufferedReader(new InputStreamReader(in));
 				String strLine;
 				try {
+					// Insert into flight table
 					while((strLine = br.readLine()) != null) {
 						String[] tokens = strLine.split(",");
 						query = "insert into FLIGHT values(?,?,?,?,?,?,?,?)";
@@ -147,17 +156,22 @@ public class Menu {
 				"WOULD YOU LIKE TO:\n" +
 				"L: Load pricing information\n" +
 				"C: Change flight price\n");
+			// Get user input
 			System.out.print("Enter Command: ");
 			inputString = scan.nextLine();
+			// If load pricing information option was selected
 			if(inputString.equals("L") || inputString.equals("l")) {
-				try {
-					System.out.print("Please enter file name with pricing information: ");
-					String filename = scan.nextLine();
+				// Get user input
+				System.out.print("Please enter file name with pricing information: ");
+				String filename = scan.nextLine();
+					try {
+					// Read from file
 					FileInputStream fstream = new FileInputStream(filename);
 					DataInputStream in = new DataInputStream(fstream);
 					BufferedReader br = new BufferedReader(new InputStreamReader(in));
 					String strLine;
 					try {
+						// Insert into price table
 						while((strLine = br.readLine()) != null) {
 							String[] tokens = strLine.split(",");
 							query = "insert into PRICE values(?,?,?,?,?)";
@@ -173,10 +187,12 @@ public class Menu {
 					} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 				} catch(IOException e) {System.out.println("FILE NOT FOUND");}
 			}
+			// If change flight pricing information was selected
 			else if(inputString.equals("C") || inputString.equals("c")) {
 				String dCity, aCity;
 				int hPrice = 0, lPrice = 0;
 				boolean invalidPrice = false;
+				// Get user input
 				System.out.println("YOU HAVE CHOSEN TO CHANGE A FLIGHT PRICE");
 				System.out.print("What is the departure city of the flight you wish to change?: ");
 				dCity = scan.nextLine();
@@ -199,8 +215,10 @@ public class Menu {
 						"\nLow Price: " + lPrice +
 						"\nIs this this correct? (Y/N)");
 					inputString = scan.nextLine();
+					// If input data is confirmed
 					if(inputString.equals("Y") || inputString.equals("y")) {
 						try {
+							// Update prices
 							query = "UPDATE price SET high_price = ? ,low_price = ? WHERE departure_city = ? AND arrival_city = ?";
 							PreparedStatement updateStatement = connection.prepareStatement(query);
 							updateStatement.setInt(1,hPrice);
@@ -208,21 +226,24 @@ public class Menu {
 							updateStatement.setString(3,dCity);
 							updateStatement.setString(4,aCity);
 							updateStatement.executeUpdate();
-							System.out.println("PRICE CHANGED");
+							System.out.println("PRICES CHANGED");
 						} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 					} else System.out.println("NOTHING CHANGED");
 				} else System.out.println("Price must be a number!");
 			} else System.out.println("INVALID CHOICE");
 		}
 		else if(choice == 5) {
+			// Get user input
+			System.out.print("Please enter file name with plane information: ");
+			String filename = scan.nextLine();
 			try {
-				System.out.print("Please enter file name with plane information: ");
-				String filename = scan.nextLine();
+				// Read from file
 				FileInputStream fstream = new FileInputStream(filename);
 				DataInputStream in = new DataInputStream(fstream);
 				BufferedReader br = new BufferedReader(new InputStreamReader(in));
 				String strLine;
 				try {
+					// Insert into plane table
 					while((strLine = br.readLine()) != null) {
 						String[] tokens = strLine.split(",");
 						java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
@@ -245,11 +266,13 @@ public class Menu {
 		}
 		else if(choice == 6) {
 			try {
+				// Get user input
 				String flightNum, flightDate;
 				System.out.print("Enter flight number: ");
 				flightNum = scan.nextLine();
 				System.out.print("Enter flight date (MM/DD/YYYY): ");
 				flightDate = scan.nextLine();
+				// Get passengers of flight on date
 				java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
 				java.sql.Date date = null;
 				try { date = new java.sql.Date(df.parse(flightDate).getTime());
@@ -312,7 +335,7 @@ public class Menu {
 
 		if(choice == 1) {
 			boolean exists = false;
-			// Get basic information
+			// Get user input
 			System.out.print("Please enter Salutation (Mr/Mrs/Ms): ");
 			String salutation = scan.nextLine();
 			System.out.print("Please enter First Name: ");
@@ -331,9 +354,11 @@ public class Menu {
 					System.out.println("Customer already exists!");
 					exists = true;
 				}
-				if(!exists) { // If name doesn't already exist, continue
+				// If name already exists, don't continue
+				if(!exists) {
 					boolean flag = false;
 					String cid = "";
+					// Generate a CID for customer
 					while(!flag) {
 						// Generate random values for cid
 						char[] chars = "0123456789".toCharArray();
@@ -342,7 +367,7 @@ public class Menu {
 						for (int i = 0; i < 9; i++)
 							sb.append(chars[rnd.nextInt(chars.length)]);
 						cid = sb.toString();
-						// Check if random value for cid already exist in the database
+						// Check if random value for cid already exists in the database
 						query = "select * from CUSTOMER where cid = ?";
 						updateStatement = connection.prepareStatement(query);
 						updateStatement.setString(1,cid);
@@ -353,7 +378,7 @@ public class Menu {
 						if(resultSet.next())
 							flag = false;
 					}
-					// Get additional info
+					// Get additional user input
 					System.out.print("Please enter Street Address: ");
 					String street = scan.nextLine();
 					System.out.print("Please enter City: ");
@@ -369,6 +394,7 @@ public class Menu {
 					System.out.print("Please enter Credit Card Expiration Date (MM/YYYY): ");
 					String expire = scan.nextLine();
 					String miles = null;
+					// Insert user
 					java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
 					java.sql.Date date = null;
 					try { date = new java.sql.Date(df.parse(expire).getTime());
@@ -459,7 +485,7 @@ public class Menu {
 					highSum2 = Integer.parseInt(resultSet.getString(1));
 					lowSum2 = Integer.parseInt(resultSet.getString(2));
 				}
-				// Round trip
+				// Get round trip prices
 				System.out.println("Round Trip from " + one + " to " + two + ":");
 				highSum1 = highSum1 + highSum2;
 				lowSum1 = lowSum1 + lowSum2;
@@ -472,8 +498,8 @@ public class Menu {
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
 			String arrive = scan.nextLine();
-			// Get direct flights
 			try {
+				// Get direct flights
 				query = "select flight_number, departure_time, arrival_time from FLIGHT where departure_city = ? and arrival_city = ?";
 				PreparedStatement updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1,depart);
@@ -537,8 +563,8 @@ public class Menu {
 			String arrive = scan.nextLine();
 			System.out.print("Please enter Airline name (full name): ");
 			String airline = scan.nextLine();
-			// Get direct flights
 			try {
+				// Get direct flights
 				query = "SELECT flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?";
 				PreparedStatement updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1, depart);
@@ -597,14 +623,14 @@ public class Menu {
 				}
 			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
-		else if(choice == 6) {
+		else if(choice == 6) { // WORK IN PROGRESS (NEEDS TO CHECK SEATING)
 			// Get user input
 			System.out.print("Please enter Departure City (3 letter): ");
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
 			String arrive = scan.nextLine();
-			// Get direct flights
 			try {
+				// Get direct flights
 				query = "select flight_number, departure_time, arrival_time from FLIGHT where departure_city = ? and arrival_city = ?";
 				PreparedStatement updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1,depart);
@@ -660,7 +686,7 @@ public class Menu {
 				}
 			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
-		else if(choice == 7) {
+		else if(choice == 7) { // WORK IN PROGRESS (Needs to check seating)
 			// Get user input
 			System.out.print("Please enter Departure City (3 letter): ");
 			String depart = scan.nextLine();
@@ -668,8 +694,8 @@ public class Menu {
 			String arrive = scan.nextLine();
 			System.out.print("Please enter Airline name (full name): ");
 			String airline = scan.nextLine();
-			// Get direct flights
 			try {
+				// Get direct flights
 				query = "SELECT flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?";
 				PreparedStatement updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1, depart);
@@ -735,9 +761,9 @@ public class Menu {
 			// Get user input
 			System.out.print("Please enter reservation number: ");
 			String num = scan.nextLine();
-			// Get flights on reservation number
 			try {
-				query = "select flight_number from DETAIL where reservation_number = ?";
+				// Get flights on reservation number
+				query = "select flight_number from detail where reservation_number = ?";
 				PreparedStatement updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1, num);
 				updateStatement.executeUpdate();
@@ -753,7 +779,17 @@ public class Menu {
 			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 10) {
-
+			// Get user input
+			System.out.print("Please enter reservation number: ");
+			String num = scan.nextLine();
+			try {
+				// Update ticketed status
+				query = "update reservation set ticketed = 'Y' where reservation_number = ?";
+				PreparedStatement updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1, num);
+				updateStatement.executeUpdate();
+				System.out.println("TICKET STATUS CHANGED TO PURCHASED");
+			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 11) {
 			System.out.println("EXITING");
