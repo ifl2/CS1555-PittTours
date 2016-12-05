@@ -282,7 +282,6 @@ public class Menu {
 			String one = scan.nextLine();
 			System.out.print("Please enter City Two (3 letter): ");
 			String two = scan.nextLine();
-			System.out.println(""); // For formatting
 			cus3(one, two);
 		}
 		else if(choice == 4) {
@@ -382,16 +381,16 @@ public class Menu {
 
 	// Administrator Command #1
 	public void adm1() {
-		try { // Drop all tables
+		try { // Delete all table contents
 			statement = connection.createStatement();
-			statement.executeQuery("drop table PLANE cascade constraints");
-			statement.executeQuery("drop table FLIGHT cascade constraints");
-			statement.executeQuery("drop table PRICE cascade constraints");
-			statement.executeQuery("drop table CUSTOMER cascade constraints");
-			statement.executeQuery("drop table RESERVATION cascade constraints");
-			statement.executeQuery("drop table DETAIL cascade constraints");
-			statement.executeQuery("drop table OUR_DATE cascade constraints");
-			statement.executeQuery("drop table AIRLINE cascade constraints");
+			statement.executeQuery("delete * from PLANE");
+			statement.executeQuery("delete * from FLIGHT");
+			statement.executeQuery("delete * from PRICE");
+			statement.executeQuery("delete * from CUSTOMER");
+			statement.executeQuery("delete * from RESERVATION");
+			statement.executeQuery("delete * from DETAIL");
+			statement.executeQuery("delete * from OUR_DATE");
+			statement.executeQuery("delete * from AIRLINE");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		System.out.println("DATABASE ERASED");
 	}
@@ -635,6 +634,7 @@ public class Menu {
 			updateStatement.setString(2,two);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
+			System.out.println(""); // For formatting
 			while(resultSet.next()) {
 				System.out.println(one + " -> " + two);
 				System.out.println(" High Price: " + resultSet.getString(1) + "\n Low Price: " + resultSet.getString(2));
