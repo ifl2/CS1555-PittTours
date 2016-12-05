@@ -71,10 +71,11 @@ public class Menu {
 
 	public void getAccess() {
 		// Display menu options
-		System.out.println("\nWelcome to PittTours are you a: ");
-		System.out.println("1: Administrator");
-		System.out.println("2: Customer");
-		System.out.println("3: Neither, Quit\n");
+		System.out.println(
+			"\nWelcome to PittTours are you a:" +
+			"\n1: Administrator" +
+			"\n2: Customer" +
+			"\n3: Neither, Quit\n");
 
 		// Get user input
 		System.out.print("Enter menu choice: ");
@@ -101,14 +102,15 @@ public class Menu {
 
 	public void displayAdmInterface() {
 		// Display menu options
-		System.out.println("\nAVAILABLE ADMINISTRATOR COMMANDS:");
-		System.out.println("1: Erase the Database");
-		System.out.println("2: Load airline information");
-		System.out.println("3: Load schedule information");
-		System.out.println("4: Load pricing information");
-		System.out.println("5: Load plane information");
-		System.out.println("6: Generate passenger manifest of flight on day");
-		System.out.println("7: Quit\n");
+		System.out.println(
+			"\nAVAILABLE ADMINISTRATOR COMMANDS:" +
+			"\n1: Erase the Database" +
+			"\n2: Load airline information" +
+			"\n3: Load schedule information" +
+			"\n4: Load pricing information" +
+			"\n5: Load plane information" +
+			"\n6: Generate passenger manifest of flight on day" +
+			"\n7: Quit\n");
 
 		// Get user input
 		System.out.print("Enter command number: ");
@@ -215,18 +217,19 @@ public class Menu {
 
 	private void displayCusInterface() {
 		// Display menu options
-		System.out.println("\nAVAILABLE CUSTOMER COMMANDS:");
-		System.out.println("1: Add customer");
-		System.out.println("2: Show customer info, given customer name");
-		System.out.println("3: Find price for flights between two cities");
-		System.out.println("4: Find all routes between two cities");
-		System.out.println("5: Find all routes between two cities of a given airline");
-		System.out.println("6: Find all routes with available seats between two cities on given day");
-		System.out.println("7: For a given airline, find all routes with available seats between two cities on given day");
-		System.out.println("8: Add reservation");
-		System.out.println("9: Show reservation info, given reservation number");
-		System.out.println("10: Buy ticket from existing reservation");
-		System.out.println("11: Quit\n");
+		System.out.println(
+			"\nAVAILABLE CUSTOMER COMMANDS:" +
+			"\n1: Add customer" +
+			"\n2: Show customer info, given customer name" +
+			"\n3: Find price for flights between two cities" +
+			"\n4: Find all routes between two cities" +
+			"\n5: Find all routes between two cities of a given airline" +
+			"\n6: Find all routes with available seats between two cities on given day" +
+			"\n7: For a given airline, find all routes with available seats between two cities on given day" +
+			"\n8: Add reservation" +
+			"\n9: Show reservation info, given reservation number" +
+			"\n10: Buy ticket from existing reservation" +
+			"\n11: Quit\n");
 
 		// Get user input
 		System.out.print("Enter command number: ");
@@ -531,11 +534,7 @@ public class Menu {
 			int counter = 1;
 			System.out.println("\nPASSENGERS OF FLIGHT " + flightNum + " ON " + flightDate + ":");
 			while(resultSet.next()) {
-				System.out.println(
-					"Passenger " + counter + ": " +
-					resultSet.getString(1) + ". " +
-					resultSet.getString(2) + " " +
-					resultSet.getString(3));
+				System.out.println("Passenger " + counter + ": " + resultSet.getString(1) + ". " + resultSet.getString(2) + " " + resultSet.getString(3));
 				counter ++;
 			}
 			System.out.println(""); // For formatting
@@ -587,12 +586,11 @@ public class Menu {
 			updateStatement.setString(7,street);
 			updateStatement.setString(8,city);
 			updateStatement.setString(9,state);
-			updateStatement.setString(10, phone);
-			updateStatement.setString(11, email);
-			updateStatement.setString(12, miles);
+			updateStatement.setString(10,phone);
+			updateStatement.setString(11,email);
+			updateStatement.setString(12,miles);
 			updateStatement.executeUpdate();
-			System.out.println("Customer successfully added to the database!");
-			System.out.println("PittRewards number: " + cid + "\n");
+			System.out.println("Customer successfully added to the database!\nPittRewards number: " + cid + "\n");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
@@ -655,9 +653,9 @@ public class Menu {
 				lowSum2 = Integer.parseInt(resultSet.getString(2));
 			}
 			// Get round trip prices
-			System.out.println("Round Trip from " + one + " to " + two + ":");
 			highSum1 = highSum1 + highSum2;
 			lowSum1 = lowSum1 + lowSum2;
+			System.out.println("Round Trip from " + one + " to " + two + ":");
 			System.out.println(" High Price: " + highSum1 + "\n Low Price: " + lowSum1 + "\n");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
@@ -675,9 +673,9 @@ public class Menu {
 			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + ":");
 			int counter = 1;
 			while(resultSet.next()) {
-				System.out.println("Route " + counter + ": ");
 				System.out.println(
-					" Flight number: " + resultSet.getString(1) +
+					"Route " + counter + ": " +
+					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
 					"\n Arrival Time: " + resultSet.getString(3));
 				counter++;
@@ -701,16 +699,15 @@ public class Menu {
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city
 					// If arrival city of leg one matches departure city of leg two, we have a valid connection!
 					if(resultSet.getString(4).equals(resultSet2.getString(4))) {
-						System.out.println("\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":");
 						System.out.println(
-							"First Leg:" +
+							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":" +
+							"\nFirst Leg:" +
 							"\n Flight number: " + resultSet.getString(1) +
 							"\n Departure Time: " + resultSet.getString(2) +
 							"\n Departure City: " + depart +
 							"\n Arrival Time: " + resultSet.getString(3) +
-							"\n Arrival City: " + resultSet.getString(4));
-						System.out.println(
-							"Second Leg:" +
+							"\n Arrival City: " + resultSet.getString(4) +
+							"\nSecond Leg:" +
 							"\n Flight number: " + resultSet2.getString(1) +
 							"\n Departure Time: " + resultSet2.getString(2) +
 							"\n Departure City: " + resultSet2.getString(4) +
@@ -729,17 +726,17 @@ public class Menu {
 			// Get direct flights
 			query = "SELECT flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?";
 			PreparedStatement updateStatement = connection.prepareStatement(query);
-			updateStatement.setString(1, depart);
-			updateStatement.setString(2, arrive);
-			updateStatement.setString(3, airline);
+			updateStatement.setString(1,depart);
+			updateStatement.setString(2,arrive);
+			updateStatement.setString(3,airline);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
 			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + " for airline " + airline + ":");
 			int counter = 1;
 			while(resultSet.next()) {
-				System.out.println("Route " + counter + ": ");
 				System.out.println(
-					" Flight number: " + resultSet.getString(1) +
+					"Route " + counter + ": " +
+					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
 					"\n Arrival Time: " + resultSet.getString(3));
 				counter++;
@@ -765,16 +762,15 @@ public class Menu {
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city and airport
 					// If arrival city of leg one matches departure city of leg two, we have a valid connection!
 					if(resultSet.getString(4).equals(resultSet2.getString(4))) {
-						System.out.println("\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":");
 						System.out.println(
-							"First Leg:" +
+							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":" +
+							"\nFirst Leg:" +
 							"\n Flight number: " + resultSet.getString(1) +
 							"\n Departure Time: " + resultSet.getString(2) +
 							"\n Departure City: " + depart +
 							"\n Arrival Time: " + resultSet.getString(3) +
-							"\n Arrival City: " + resultSet.getString(4));
-						System.out.println(
-							"Second Leg:" +
+							"\n Arrival City: " + resultSet.getString(4) +
+							"\nSecond Leg:" +
 							"\n Flight number: " + resultSet2.getString(1) +
 							"\n Departure Time: " + resultSet2.getString(2) +
 							"\n Departure City: " + resultSet2.getString(4) +
@@ -800,9 +796,9 @@ public class Menu {
 			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + ":");
 			int counter = 1;
 			while(resultSet.next()) {
-				System.out.println("Route " + counter + ": ");
 				System.out.println(
-					" Flight number: " + resultSet.getString(1) +
+					"Route " + counter + ": " +
+					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
 					"\n Arrival Time: " + resultSet.getString(3));
 				counter++;
@@ -826,16 +822,15 @@ public class Menu {
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city
 					// If arrival city of leg one matches departure city of leg two, we have a valid connection!
 					if(resultSet.getString(4).equals(resultSet2.getString(4))) {
-						System.out.println("\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":");
 						System.out.println(
-							"First Leg:" +
+							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":" +
+							"\nFirst Leg:" +
 							"\n Flight number: " + resultSet.getString(1) +
 							"\n Departure Time: " + resultSet.getString(2) +
 							"\n Departure City: " + depart +
 							"\n Arrival Time: " + resultSet.getString(3) +
-							"\n Arrival City: " + resultSet.getString(4));
-						System.out.println(
-							"Second Leg:" +
+							"\n Arrival City: " + resultSet.getString(4) +
+							"\nSecond Leg:" +
 							"\n Flight number: " + resultSet2.getString(1) +
 							"\n Departure Time: " + resultSet2.getString(2) +
 							"\n Departure City: " + resultSet2.getString(4) +
@@ -854,17 +849,17 @@ public class Menu {
 			// Get direct flights
 			query = "SELECT flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?";
 			PreparedStatement updateStatement = connection.prepareStatement(query);
-			updateStatement.setString(1, depart);
-			updateStatement.setString(2, arrive);
-			updateStatement.setString(3, airline);
+			updateStatement.setString(1,depart);
+			updateStatement.setString(2,arrive);
+			updateStatement.setString(3,airline);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
 			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + " for airline " + airline + ":");
 			int counter = 1;
 			while(resultSet.next()) {
-				System.out.println("Route " + counter + ": ");
 				System.out.println(
-					" Flight number: " + resultSet.getString(1) +
+					"Route " + counter + ": " +
+					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
 					"\n Arrival Time: " + resultSet.getString(3));
 				counter++;
@@ -890,16 +885,15 @@ public class Menu {
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city and airport
 					// If arrival city of leg one matches departure city of leg two, we have a valid connection!
 					if(resultSet.getString(4).equals(resultSet2.getString(4))) {
-						System.out.println("\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":");
 						System.out.println(
-							"First Leg:" +
+							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":" +
+							"\nFirst Leg:" +
 							"\n Flight number: " + resultSet.getString(1) +
 							"\n Departure Time: " + resultSet.getString(2) +
 							"\n Departure City: " + depart +
 							"\n Arrival Time: " + resultSet.getString(3) +
-							"\n Arrival City: " + resultSet.getString(4));
-						System.out.println(
-							"Second Leg:" +
+							"\n Arrival City: " + resultSet.getString(4) +
+							"\nSecond Leg:" +
 							"\n Flight number: " + resultSet2.getString(1) +
 							"\n Departure Time: " + resultSet2.getString(2) +
 							"\n Departure City: " + resultSet2.getString(4) +
@@ -915,8 +909,8 @@ public class Menu {
 	// Customer Command #8 - WORK IN PROGRESS
 	public void cus8(String... inputs) {
 		// Store inputs
-		String flightN1 = inputs[0], flightN2 = inputs[1], flightN3 = inputs[2], flightN4 = inputs[3];
-		String dateN1 = inputs[4], dateN2 = inputs[5], dateN3 = inputs[6], dateN4 = inputs[7];
+		String flightN1 = inputs[0], flightN2 = inputs[1], flightN3 = inputs[2], flightN4 = inputs[3],
+			dateN1 = inputs[4], dateN2 = inputs[5], dateN3 = inputs[6], dateN4 = inputs[7];
 		// Convert dates if they aren't null
 		java.sql.Date date1 = null, date2 = null, date3 = null, date4 = null;
 		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
