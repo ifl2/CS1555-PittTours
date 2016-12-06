@@ -536,3 +536,20 @@ PreparedStatement updateStatement = connection.prepareStatement(query);
       updateStatement.executeUpdate();
 System.out.println("TICKET WAS CHANGED TO PURCHASED");
 
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+________________________________________________________________________
+________________________________________________________________________
+////////////////////////////////////////////////////////////////////////
+
+select *
+from FLIGHT F1, PLANE
+where F1.flight_number in (	select F2.flight_number 
+				from flight F2 
+				where F2.departure_city = ? AND F2.arrival_city = ?)
+			AND F1.plane_type = plane.plane_type
+			AND plane.plane_capacity > (	select count(D.flight_number)
+			    				from DETAIL D
+			    				where D.flight_number in (	select F3.flight_number 
+			    								from flight F3 
+											where F3.departure_city = ? AND F3.arrival_city = ?))
+
