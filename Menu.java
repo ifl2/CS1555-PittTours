@@ -5,6 +5,7 @@
 		adm3(filename);
 		adm4L(filename):
 		adm4C(departure_city, arrival_city, high_price, low_price);
+			high_price & low_price are ints
 		adm5(filename);
 		adm6(flight_number, flight_date);
 			flight_date -> date format: MM/DD/YYYY
@@ -386,14 +387,14 @@ public class Menu {
 	public void adm1() {
 		try { // Delete all table contents
 			statement = connection.createStatement();
-			statement.executeQuery("delete * from PLANE");
-			statement.executeQuery("delete * from FLIGHT");
-			statement.executeQuery("delete * from PRICE");
-			statement.executeQuery("delete * from CUSTOMER");
-			statement.executeQuery("delete * from RESERVATION");
-			statement.executeQuery("delete * from DETAIL");
-			statement.executeQuery("delete * from OUR_DATE");
-			statement.executeQuery("delete * from AIRLINE");
+			statement.executeQuery("delete from PLANE");
+			statement.executeQuery("delete from FLIGHT");
+			statement.executeQuery("delete from PRICE");
+			statement.executeQuery("delete from CUSTOMER");
+			statement.executeQuery("delete from RESERVATION");
+			statement.executeQuery("delete from DETAIL");
+			statement.executeQuery("delete from OUR_DATE");
+			statement.executeQuery("delete from AIRLINE");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		System.out.println("DATABASE ERASED");
 	}
