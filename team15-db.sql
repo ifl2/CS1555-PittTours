@@ -38,7 +38,8 @@ constraint pk_plane primary key(plane_type, owner_id),
 constraint fk_plane foreign key(owner_id) references AIRLINE(airline_id) on delete cascade);
 
 -- Not Null: Every flight must have a depearture city and arrival city
--- Plane deletion set null, flight can get a different plane
+-- Plane deletion cascade (this is for table data deletion)
+--	 (ideally would have a trigger to replace all plane models before a plane was removed from service)
 -- Check: Departure city can not match arrival city
 -- Did not add check for arrival_time being before departure time, due to flights that pass over midnight
 create table FLIGHT(
@@ -51,7 +52,7 @@ departure_time varchar(4),
 arrival_time varchar(4),
 weekly_schedule varchar(7),
 constraint pk_flight primary key(flight_number),
-constraint fk_flight foreign key(plane_type, airline_id) references PLANE(plane_type, owner_id) on delete set null,
+constraint fk_flight foreign key(plane_type, airline_id) references PLANE(plane_type, owner_id) on delete cascade,
 constraint ch_city_flight check(departure_city != arrival_city));
 
 -- Not Null: Flights must have pricing information, otherwise a lot of things will break
@@ -100,8 +101,8 @@ ticketed varchar(1) not null,
 constraint pk_reservation primary key(reservation_number),
 constraint fk_reservation foreign key(cid) references CUSTOMER(cid) on delete cascade);
 
--- Flight deletion will set null instead of deleting leg, for a new flight can be found
--- (otherwise a passenger's trip has just ended, no matter their location)
+-- Flight deletion cascade to flight legs. If a flight no longer exists, a new flight leg would be found
+--	 (most likely would be a trigger to switch flights of all affected legs before deletion)
 create table DETAIL(
 reservation_number varchar(5) not null,
 flight_number varchar(3),
@@ -109,7 +110,7 @@ flight_date date,
 leg int not null,
 constraint pk_detail primary key(reservation_number, leg),
 constraint fk_detail1 foreign key(reservation_number) references RESERVATION(reservation_number) on delete cascade,
-constraint fk_detail2 foreign key(flight_number) references FLIGHT(flight_number) on delete set null);
+constraint fk_detail2 foreign key(flight_number) references FLIGHT(flight_number) on delete cascade);
 
 create table OUR_DATE(
 c_date date not null,
