@@ -120,19 +120,22 @@ public class Driver {
 	public void runBenchmark() {
 		System.out.println("\nA2: LOADING AIRLINES...");
 		menu.adm2("airlines2.txt");
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		System.out.println("\nA3: LOADING FLIGHTS...");
 		menu.adm3("flights2.txt"); // Make flights2.txt
+		menu.resetConnection();
 		System.out.println("\nA5: LOADING PLANES...");
 		menu.adm5("planes2.txt"); // Make planes2.txt
+		menu.resetConnection();
 		System.out.println("\nA4L: LOADING PRICES...");
 		menu.adm4L("prices2.txt"); // Make prices2.txt
+		menu.resetConnection();
 		System.out.println("\nA4C: CHANGING FLIGHT PRICES...");
 		runadm4C();
 		System.out.print("\nA6: GENERATING PASSENGER MANIFESTS...");
 		runadm6();
 		// Finish customer benchmarks
-		// Fills maximum open cursors, after each command reset connection
-		System.out.println("\BENCHMARK COMPLETE");
+		System.out.println("\nBENCHMARK COMPLETE");
 		System.out.print("Press Enter to Continue... ");
 		scan.nextLine();
 		driverMenu();
@@ -154,7 +157,7 @@ public class Driver {
 	//  MAIN : handles primary method calls   //
 	////////////////////////////////////////////
 
-	public static void main(String args[]) throws SQLException {
+	public static void main(String args[]) {
 		// Connect to the Database
 		menu.connectDB();
 		// Go to driver menu
@@ -167,6 +170,7 @@ public class Driver {
 	////////////////////////////////////////////////////////////////////////////
 
 	public void runadm4C() {
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.adm4C("LAX", "LAS", 1243, 1178);
 		menu.adm4C("PHX", "SEA", 1233, 1189);
 		menu.adm4C("MCO", "ATL", 1293, 1182);
@@ -270,6 +274,7 @@ public class Driver {
 	}
 
 	public void runadm6() {
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.adm6("010", "04/30/2015");
 		menu.adm6("011", "10/31/2016");
 		menu.adm6("012", "09/30/2016");
