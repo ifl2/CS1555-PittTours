@@ -5,7 +5,7 @@
 		adm3(filename);
 		adm4L(filename):
 		adm4C(departure_city, arrival_city, high_price, low_price);
-			high_price & low_price are ints
+			high_price & low_price -> int
 		adm5(filename);
 		adm6(flight_number, flight_date);
 			flight_date -> date format: MM/DD/YYYY
@@ -40,7 +40,7 @@ public class Menu {
 	private Statement statement;
 	private ResultSet resultSet, resultSet2;
 	private Scanner scan = new Scanner(System.in);
-	private String inputString, query;
+	private String inputString, query, username, password;
 	private int choice;
 	private boolean exit;
 
@@ -51,11 +51,29 @@ public class Menu {
 	public void connectDB() {
 		System.out.println("CONNECTING TO DB");
 		System.out.print("Username: ");
-		String username = scan.nextLine();
+		username = scan.nextLine();
 		Console console = System.console(); // Hides password input in console
-		String password = new String(console.readPassword("Password: "));
+		password = new String(console.readPassword("Password: "));
 		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 		try {
+			DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver());
+			connection = DriverManager.getConnection(url, username, password);
+		} catch(Exception Ex) {
+			System.out.println("Error connecting to database.  Machine Error: " + Ex.toString());
+			Ex.printStackTrace();
+			System.out.println("\nCONNECTION IS REQUIRED: EXITING");
+			System.exit(0); // No need to make sure connection is closed since it wasn't made
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	//  RESET CONNECTION : used by driver to avoid 'maximum cursors open' error  //
+	///////////////////////////////////////////////////////////////////////////////
+
+	public void resetConnection() {
+		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
+		try {
+			connection.close();
 			DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver());
 			connection = DriverManager.getConnection(url, username, password);
 		} catch(Exception Ex) {
@@ -207,7 +225,7 @@ public class Menu {
 		if(!exit) { // Exiting will ignore loop and drop to main to exit properly
 			// Repeat menu after user controlled pause
 			System.out.print("Press Enter to Continue... ");
-			inputString = scan.nextLine();
+			scan.nextLine();
 			displayAdmInterface();
 		}
 	}
@@ -374,7 +392,7 @@ public class Menu {
 		if(!exit) { // Exiting will ignore loop and drop to main to exit properly
 			// Repeat menu after user controlled pause
 			System.out.print("Press Enter to Continue... ");
-			inputString = scan.nextLine();
+			scan.nextLine();
 			displayCusInterface();
 		}
 	}
