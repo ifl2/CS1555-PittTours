@@ -499,6 +499,27 @@ resultSet = statement.executeQuery(query);
 
 7#
 
+System.out.println(" Please enter Departure City(3 letter)");
+String depart = scan.nextLine();
+System.out.println(" Please enter Arrival City(3 letter)");
+String arrive = scan.nextLine();
+System.out.println(" Please enter Date as MM/DD/YYYY ");
+String date = scan.nextLine();
+System.out.println(" Please enter Airline name");
+String airline = scan.nextLine();
+
+
+query = "SELECT flight_number, departure_time, arrival_time FROM detail d full join flight f on d.flight_number = f.flight_number 
+where f.flight_number in (select F1.fight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.departure_city = ? AND F2.arrival_city = ?) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ? and airline_name = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, depart);
+      updateStatement.setString(2, arrive); 
+      updateStatement.setString(3, depart);
+      updateStatement.setString(4, arrive); 
+      updateStatement.setString(5, date);   
+      updateStatement.setString(6, airline);
+      updateStatement.executeUpdate();
+
 8#
 
 
