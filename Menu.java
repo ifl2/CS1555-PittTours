@@ -1,46 +1,16 @@
-/* METHOD SYNTAX FOR DRIVER
-	ADMIN COMMANDS
-		adm1();
-		adm2(filename);
-		adm3(filename);
-		adm4L(filename):
-		adm4C(departure_city, arrival_city, high_price, low_price);
-			high_price & low_price -> int
-		adm5(filename);
-		adm6(flight_number, flight_date);
-			flight_date -> date format: MM/DD/YYYY
-	CUSTOMER COMMANDS
-		cus1(salutation, first_name, last_name, street, city, state, phone, email, credit_card_num, credit_card_expire);
-			salutation -> Mr/Mrs/Ms
-			state -> 2 letter abbreviation
-			credit_card_expire -> date format: MM/YYYY
-		cus2(first_name, last_name);
-		cus3(city_one, city_two);
-		cus4(departure_city, arrival_city);
-		cus5(departure_city, arrival_city, airline_name);
-		cus6(departure_city, arrival_city);
-		cus7(departure_city, arrival_city, airline_name);
-		cus8(flight_num_1, flight_num_2, flight_num_3, flight_num_4, date_1, date_1, date_3, date_4);
-			flight_num_1 -> leg one away (required)
-			flight_num_2 -> leg two away (optional)
-			flight_num_3 -> leg one return (optional)
-			flight_num_3 -> leg two return (optional, flight_num_3 required)
-			date_# -> date of corresponding flight number (date format: MM/DD/YYYY)
-		cus9(reservation_number);
-		cus10(reservation_number)
-*/
-
 import java.sql.*;
 import java.util.*;
 import java.io.*;
 import java.text.ParseException;
 
 public class Menu {
+	private static Menu menu = new Menu();
 	private static Connection connection;
 	private Statement statement;
 	private ResultSet resultSet, resultSet2;
 	private Scanner scan = new Scanner(System.in);
 	private String inputString, query, username, password;
+	private String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 	private int choice;
 	private boolean exit;
 
@@ -54,7 +24,6 @@ public class Menu {
 		username = scan.nextLine();
 		Console console = System.console(); // Hides password input in console
 		password = new String(console.readPassword("Password: "));
-		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 		try {
 			DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver());
 			connection = DriverManager.getConnection(url, username, password);
@@ -71,7 +40,6 @@ public class Menu {
 	///////////////////////////////////////////////////////////////////////////////
 
 	public void resetConnection() {
-		String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 		try {
 			connection.close();
 			DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver());
@@ -327,16 +295,20 @@ public class Menu {
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
 			String arrive = scan.nextLine();
-			cus6(depart, arrive);
+			System.out.print("Please enter Date (MM/DD/YYYY): ");
+			String date = scan.nextLine();
+			cus6(depart, arrive, date);
 		}
 		else if(choice == 7) {
 			System.out.print("Please enter Departure City (3 letter): ");
 			String depart = scan.nextLine();
 			System.out.print("Please enter Arrival City (3 letter): ");
 			String arrive = scan.nextLine();
+			System.out.print("Please enter Date (MM/DD/YYYY): ");
+			String date = scan.nextLine();
 			System.out.print("Please enter Airline name (full name): ");
 			String airline = scan.nextLine();
-			cus7(depart, arrive, airline);
+			cus7(depart, arrive, date, airline);
 		}
 		else if(choice == 8) {
 			String flightN1 = null, flightN2 = null, flightN3 = null, flightN4 = null;
@@ -803,9 +775,35 @@ public class Menu {
 	}
 
 	// Customer Command #6 - WORK IN PROGRESS: NEEDS TO CHECK AVAILABLE SEATING
-	public void cus6(String arrive, String depart) {
+	public void cus6(String arrive, String depart, String dateInput) {
+		// Convert date
+		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
+		java.sql.Date date = null;
+		try { date = new java.sql.Date(df.parse(dateInput).getTime());
+		} catch(Exception e) {System.out.println("INVALID DATE");}
 		try {
-			// Get direct flights
+			query = "SELECT flight_number, departure_time, arrival_time FROM detail d full join flight f on d.flight_number = f.flight_number where f.flight_number in (select F1.fight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.departure_city = ? AND F2.arrival_city = ?) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ?)";
+			PreparedStatement updateStatement = connection.prepareStatement(query);
+			updateStatement.setString(1,depart);
+			updateStatement.setString(2,arrive); 
+			updateStatement.setString(3,depart);
+			updateStatement.setString(4,arrive); 
+			updateStatement.setDate(5,date);    
+			updateStatement.executeUpdate();
+			resultSet = updateStatement.executeQuery(query);
+
+			System.out.println("All routes between " + depart + " -> " + arrive + ":");
+			int counter = 1;
+			while(resultSet.next()) {
+				System.out.println(
+					"Route " + counter + ": " +
+					"\n Flight number: " + resultSet.getString(1) +
+					"\n Departure Time: " + resultSet.getString(2) +
+					"\n Arrival Time: " + resultSet.getString(3));
+				counter++;
+			}
+
+/*			// Get direct flights
 			query = "select flight_number, departure_time, arrival_time from FLIGHT where departure_city = ? and arrival_city = ?";
 			PreparedStatement updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1,depart);
@@ -859,11 +857,16 @@ public class Menu {
 				}
 				System.out.println(""); // For formatting
 			}
-		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
+*/		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
 	// Customer Command #7 - WORK IN PROGRESS: NEEDS TO CHECK AVAILABLE SEATING
-	public void cus7(String depart, String arrive, String airline) {
+	public void cus7(String depart, String arrive, String dateInput, String airline) {
+		// Convert date
+		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
+		java.sql.Date date = null;
+		try { date = new java.sql.Date(df.parse(dateInput).getTime());
+		} catch(Exception e) {System.out.println("INVALID DATE");}
 		try {
 			// Get direct flights
 			query = "SELECT flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?";
@@ -987,7 +990,6 @@ public class Menu {
 
 	public static void main(String args[]) throws SQLException {
 		// Connect to the Database
-		Menu menu = new Menu();
 		menu.connectDB();
 		// Determine Admin or Customer access, then run interface
 		menu.getAccess();
