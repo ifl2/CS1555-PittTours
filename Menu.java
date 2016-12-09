@@ -752,20 +752,20 @@ public class Menu {
 				resultSet2 = statement.executeQuery(query);
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city and airport
 					// If arrival city of leg one matches departure city of leg two, we have a valid connection!
-					if(resultSet.getString(4).equals(resultSet2.getString(4))) {
+					if(resultSet.getString(5).equals(resultSet2.getString(5))) {
 						System.out.println(
-							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":" +
+							"\nRoute with connection: " + depart + " -> " + resultSet.getString(5) + " -> " + arrive + ":" +
 							"\nFirst Leg:" +
-							"\n Flight number: " + resultSet.getString(1) +
-							"\n Departure Time: " + resultSet.getString(2) +
+							"\n Flight number: " + resultSet.getString(2) +
+							"\n Departure Time: " + resultSet.getString(3) +
 							"\n Departure City: " + depart +
-							"\n Arrival Time: " + resultSet.getString(3) +
-							"\n Arrival City: " + resultSet.getString(4) +
+							"\n Arrival Time: " + resultSet.getString(4) +
+							"\n Arrival City: " + resultSet.getString(5) +
 							"\nSecond Leg:" +
-							"\n Flight number: " + resultSet2.getString(1) +
-							"\n Departure Time: " + resultSet2.getString(2) +
-							"\n Departure City: " + resultSet2.getString(4) +
-							"\n Arrival Time: " + resultSet2.getString(3) +
+							"\n Flight number: " + resultSet2.getString(2) +
+							"\n Departure Time: " + resultSet2.getString(3) +
+							"\n Departure City: " + resultSet2.getString(5) +
+							"\n Arrival Time: " + resultSet2.getString(4) +
 							"\n Arrival City: " + arrive);
 					}
 				}
