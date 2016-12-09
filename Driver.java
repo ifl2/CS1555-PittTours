@@ -1,4 +1,4 @@
-/* METHOD SYNTAX FOR DRIVER
+/* METHOD SYNTAX OF MENU
 	ADMIN COMMANDS
 		adm1();
 		adm2(filename);
@@ -18,8 +18,12 @@
 		cus3(city_one, city_two);
 		cus4(departure_city, arrival_city);
 		cus5(departure_city, arrival_city, airline_name);
-		cus6(departure_city, arrival_city);
-		cus7(departure_city, arrival_city, airline_name);
+			airline_name -> full name, not id
+		cus6(departure_city, arrival_city, date);
+			date format: MM/DD/YYYY
+		cus7(departure_city, arrival_city, date, airline_name);
+			date format: MM/DD/YYY
+			airline_name -> full name, not id
 		cus8(flight_num_1, flight_num_2, flight_num_3, flight_num_4, date_1, date_1, date_3, date_4);
 			flight_num_1 -> leg one away (required)
 			flight_num_2 -> leg two away (optional)
@@ -35,8 +39,9 @@ import java.util.*;
 import java.io.*;
 
 public class Driver {
-	private Scanner scan = new Scanner(System.in);
 	private static Menu menu = new Menu();
+	private static Driver driver = new Driver();
+	private Scanner scan = new Scanner(System.in);
 
 	////////////////////////////////////////////////////////
 	//  DRIVER MENU : gives different driver run options  //
@@ -48,7 +53,7 @@ public class Driver {
 			"\n1: Demonstration (run through each command once)" +
 			"\n2: Benchmark (run through commands extensively)" +
 			"\n3: Delete Database (seperated to prevent unwanted deletion)" +
-			"\n4: Neither, Quit\n");
+			"\n4: Quit\n");
 		System.out.print("Enter menu choice: ");
 		String inputString = scan.nextLine();
 		int choice = 0;
@@ -95,12 +100,12 @@ public class Driver {
 		menu.cus3("LAS", "JFK");
 		System.out.println("C4: SHOWING AVAILABLE ROUTES...");
 		menu.cus4("LAS", "JFK");
-		System.out.println("\nC5: SHOWING AVAILABLE ROUTES GIVEN AIRLINE...");
+		System.out.println("\nC5: SHOWING ROUTES WITH SEATING ON DATE...");
 		menu.cus5("LAS", "JFK", "Airline005");
 		System.out.println("\nC6: SHOWING AVAILABLE ROUTES...");
-		menu.cus6("LAS", "JFK"); // Will have data added
-		System.out.println("\nC7: SHOWING AVAILABLE ROUTES GIVEN AIRLINE...");
-		menu.cus7("LAS", "JFK", "Airline005"); // Will have date added
+		menu.cus6("LAX", "MSP", "12/25/2016");
+		System.out.println("\nC7: SHOWING ROUTES WITH SEATING GIVEN AIRLINE ON DATE...");
+		menu.cus7("LAX", "MSP", "12/25/2016", "Airline003");
 		//System.out.println("C8: ADDING RESERVAION...");
 		//menu.cus8(); // Add once command is complete
 		System.out.print("\nC9: SHOWING RESERVATION INFO...");
@@ -161,7 +166,6 @@ public class Driver {
 		// Connect to the Database
 		menu.connectDB();
 		// Go to driver menu
-		Driver driver = new Driver();
 		driver.driverMenu();
 	}
 
