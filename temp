@@ -743,6 +743,16 @@ PreparedStatement updateStatement = connection.prepareStatement(query);
       updateStatement.setString(7,end); 
       updateStatement.setString(8,tick);    
       updateStatement.executeUpdate();
+      
+//For each flight number add to detail
+
+query = "INSERT INTO detail VALUES(?,?,?,?)";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,R_num);
+      updateStatement.setString(2,flight_number);
+      updateStatement.setString(3,flight_date);
+      updateStatement.setString(4,leg); //number of leg
+      updateStatement.executeUpdate();
 
 
 
