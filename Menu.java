@@ -12,7 +12,7 @@ public class Menu {
 	private String inputString, query, username, password;
 	private String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 	private int choice;
-	private boolean exit;
+	private boolean exit, flight_connection;
 
 	//////////////////////////////////////////////////////////////
 	//  CONNECTION TO DATABASE : makes necessary db connection  //
@@ -652,7 +652,7 @@ public class Menu {
 	}
 
 	// Customer Command #4
-	public void cus4(String arrive, String depart) {
+	public void cus4(String depart, String arrive) {
 		try {
 			// Get direct flights
 			query = "select flight_number, departure_time, arrival_time from FLIGHT where departure_city = ? and arrival_city = ?";
@@ -661,17 +661,21 @@ public class Menu {
 			updateStatement.setString(2,arrive);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
-			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + ":");
 			int counter = 1;
 			while(resultSet.next()) {
+				if(counter == 1) // Display only if first time, but not at all if no direct routes
+					System.out.println("\nAll direct routes between " + depart + " -> " + arrive + ":");
 				System.out.println(
 					"Route " + counter + ": " +
 					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
-					"\n Arrival Time: " + resultSet.getString(3));
+					"\n Arrival Time: " + resultSet.getString(3) + "\n");
 				counter++;
 			}
+			if(counter == 1) // Display only if we found no direct routes
+				System.out.println("\nNo direct routes between " + depart + " -> " + arrive + ".\n");
 			// Get connected flights
+			flight_connection = false;
 			query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.arrival_city FROM flight f WHERE f.departure_city = ? AND f.arrival_city in (SELECT arrival_city from (SELECT f1.arrival_city FROM flight f1 where f1.departure_city = ?) natural join (SELECT f2.departure_city from flight f2 where f2.arrival_city = ?) where arrival_city = departure_city)";
 			updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1,depart);
@@ -704,10 +708,13 @@ public class Menu {
 							"\n Departure City: " + resultSet2.getString(4) +
 							"\n Arrival Time: " + resultSet2.getString(3) +
 							"\n Arrival City: " + arrive);
+						flight_connection = true;
 					}
 				}
 				System.out.println(""); // For formatting
 			}
+			if(!flight_connection) // Display only if no connected flights were found
+				System.out.println("No connected flights between " + depart + " -> " + arrive + ".\n");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
@@ -722,18 +729,22 @@ public class Menu {
 			updateStatement.setString(3,airline);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
-			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + " for airline " + airline + ":");
 			int counter = 1;
 			while(resultSet.next()) {
+				if(counter == 1) // Display only if first time, but not at all if no direct routes
+					System.out.println("\nAll direct routes between " + depart + " -> " + arrive + " for airline " + airline + ":");
 				System.out.println(
 					"Route " + counter + ": " +
 					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
-					"\n Arrival Time: " + resultSet.getString(3));
+					"\n Arrival Time: " + resultSet.getString(3) + "\n");
 				counter++;
 			}
+			if(counter == 1) // Display only if we found no direct routes
+				System.out.println("\nNo direct routes between " + depart + " -> " + arrive + " for airline " + airline + ".\n");
 			// Get connected flights
-			query = "SELECT f.airline_id, f.flight_number, f.departure_time, f.arrival_time, f.arrival_city FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND airline_name = ? AND arrival_city in (SELECT arrival_city from (SELECT f1.arrival_city FROM flight f1 where f1.departure_city = ?) natural join (SELECT f2.departure_city from flight f2 where f2.arrival_city = ?) where arrival_city = departure_city)";
+			flight_connection = false;
+			query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.arrival_city, f.airline_id FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND airline_name = ? AND arrival_city in (SELECT arrival_city from (SELECT f1.arrival_city FROM flight f1 where f1.departure_city = ?) natural join (SELECT f2.departure_city from flight f2 where f2.arrival_city = ?) where arrival_city = departure_city)";
 			updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1,depart);
 			updateStatement.setString(2,airline);
@@ -742,98 +753,93 @@ public class Menu {
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
 			while(resultSet.next()) { // This loop goes through all legs with stated departure city and airport
-				query = "SELECT f.airline_id, f.flight_number, f.departure_time, f.arrival_time, f.departure_city FROM flight f full join airline a on f.airline_id = a.airline_id WHERE arrival_city = ? AND airline_name = ? AND departure_city in (SELECT departure_city from (SELECT f1.departure_city FROM flight f1 where f1.arrival_city = ?) natural join (SELECT f2.arrival_city from flight f2 where f2.departure_city = ?) where arrival_city = departure_city)";
+				query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.departure_city, f.airline_id FROM flight f full join airline a on f.airline_id = a.airline_id WHERE arrival_city = ? AND airline_name = ? AND departure_city in (SELECT departure_city from (SELECT f1.departure_city FROM flight f1 where f1.arrival_city = ?) natural join (SELECT f2.arrival_city from flight f2 where f2.departure_city = ?) where arrival_city = departure_city)";
 				updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1,arrive);
 				updateStatement.setString(2,airline);
 				updateStatement.setString(3,arrive);
 				updateStatement.setString(4,depart);
 				updateStatement.executeUpdate();
-				resultSet2 = statement.executeQuery(query);
+				resultSet2 = updateStatement.executeQuery(query);
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city and airport
 					// If arrival city of leg one matches departure city of leg two, we have a valid connection!
-					if(resultSet.getString(5).equals(resultSet2.getString(5))) {
+					if(resultSet.getString(4).equals(resultSet2.getString(4))) {
 						System.out.println(
-							"\nRoute with connection: " + depart + " -> " + resultSet.getString(5) + " -> " + arrive + ":" +
+							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + " for airline " + airline + ":" +
 							"\nFirst Leg:" +
-							"\n Flight number: " + resultSet.getString(2) +
-							"\n Departure Time: " + resultSet.getString(3) +
+							"\n Flight number: " + resultSet.getString(1) +
+							"\n Departure Time: " + resultSet.getString(2) +
 							"\n Departure City: " + depart +
-							"\n Arrival Time: " + resultSet.getString(4) +
-							"\n Arrival City: " + resultSet.getString(5) +
+							"\n Arrival Time: " + resultSet.getString(3) +
+							"\n Arrival City: " + resultSet.getString(4) +
 							"\nSecond Leg:" +
-							"\n Flight number: " + resultSet2.getString(2) +
-							"\n Departure Time: " + resultSet2.getString(3) +
-							"\n Departure City: " + resultSet2.getString(5) +
-							"\n Arrival Time: " + resultSet2.getString(4) +
+							"\n Flight number: " + resultSet2.getString(1) +
+							"\n Departure Time: " + resultSet2.getString(2) +
+							"\n Departure City: " + resultSet2.getString(4) +
+							"\n Arrival Time: " + resultSet2.getString(3) +
 							"\n Arrival City: " + arrive);
+						flight_connection = true;
 					}
 				}
 				System.out.println(""); // For formatting
 			}
+			if(!flight_connection) // Display only if no connected flights were found
+				System.out.println("No connected flights between " + depart + " -> " + arrive + " for airline " + airline + ".\n");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
-	// Customer Command #6 - WORK IN PROGRESS: NEEDS TO CHECK AVAILABLE SEATING
-	public void cus6(String arrive, String depart, String dateInput) {
+	// Customer Command #6
+	public void cus6(String depart, String arrive, String dateInput) {
 		// Convert date
 		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
 		java.sql.Date date = null;
 		try { date = new java.sql.Date(df.parse(dateInput).getTime());
 		} catch(Exception e) {System.out.println("INVALID DATE");}
 		try {
-			query = "SELECT flight_number, departure_time, arrival_time FROM detail d full join flight f on d.flight_number = f.flight_number where f.flight_number in (select F1.fight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.departure_city = ? AND F2.arrival_city = ?) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ?)";
-			PreparedStatement updateStatement = connection.prepareStatement(query);
-			updateStatement.setString(1,depart);
-			updateStatement.setString(2,arrive); 
-			updateStatement.setString(3,depart);
-			updateStatement.setString(4,arrive); 
-			updateStatement.setDate(5,date);    
-			updateStatement.executeUpdate();
-			resultSet = updateStatement.executeQuery(query);
-
-			System.out.println("All routes between " + depart + " -> " + arrive + ":");
-			int counter = 1;
-			while(resultSet.next()) {
-				System.out.println(
-					"Route " + counter + ": " +
-					"\n Flight number: " + resultSet.getString(1) +
-					"\n Departure Time: " + resultSet.getString(2) +
-					"\n Arrival Time: " + resultSet.getString(3));
-				counter++;
-			}
-
-/*			// Get direct flights
-			query = "select flight_number, departure_time, arrival_time from FLIGHT where departure_city = ? and arrival_city = ?";
+			// Get direct flights
+			query = "SELECT f.flight_number, f.departure_time, f.arrival_time FROM detail d full join flight f on d.flight_number = f.flight_number where f.flight_number in (select F1.flight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.departure_city = ? AND F2.arrival_city = ?) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D1.flight_number) from DETAIL D1 where D1.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ?)";
 			PreparedStatement updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1,depart);
 			updateStatement.setString(2,arrive);
+			updateStatement.setString(3,depart);
+			updateStatement.setString(4,arrive);
+			updateStatement.setDate(5,date);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
-			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + ":");
 			int counter = 1;
 			while(resultSet.next()) {
+				if(counter == 1) // Display only if first time, but not at all if no direct routes
+					System.out.println("\nAll direct routes between " + depart + " -> " + arrive + ":");
 				System.out.println(
 					"Route " + counter + ": " +
 					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
-					"\n Arrival Time: " + resultSet.getString(3));
+					"\n Arrival Time: " + resultSet.getString(3) + "\n");
 				counter++;
 			}
+			if(counter == 1) // Display only if we found no direct routes
+				System.out.println("\nNo direct routes between " + depart + " -> " + arrive + ".\n");
 			// Get connected flights
-			query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.arrival_city FROM flight f WHERE f.departure_city = ? AND f.arrival_city in (SELECT arrival_city from (SELECT f1.arrival_city FROM flight f1 where f1.departure_city = ?) natural join (SELECT f2.departure_city from flight f2 where f2.arrival_city = ?) where arrival_city = departure_city)";
+			flight_connection = false;
+			query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.arrival_city FROM detail d full join flight f on d.flight_number = f.flight_number where f.flight_number in (select F1.flight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.departure_city = ? AND F2.arrival_city in (SELECT arrival_city from (SELECT f4.arrival_city FROM flight f4 where f4.departure_city = ?) natural join (SELECT f5.departure_city from flight f5 where f5.arrival_city = ?) where arrival_city = departure_city)) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D1.flight_number) from DETAIL D1 where D1.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ?)";
 			updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1,depart);
 			updateStatement.setString(2,depart);
 			updateStatement.setString(3,arrive);
+			updateStatement.setString(4,depart);
+			updateStatement.setString(5,arrive);
+			updateStatement.setDate(6,date);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
 			while(resultSet.next()) { // This loop goes through all legs with stated departure city
-				query = "SELECT f.flight_number, f.departure_time, f.departure_time, f.departure_city FROM flight f WHERE f.arrival_city = ? AND f.departure_city in (SELECT departure_city from (SELECT f1.departure_city FROM flight f1 where f1.arrival_city = ?) natural join (SELECT f2.arrival_city from flight f2 where f2.departure_city = ?) where arrival_city = departure_city)";
+				query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.departure_city FROM detail d full join flight f on d.flight_number = f.flight_number where f.flight_number in (select F1.flight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.arrival_city = ? AND F2.departure_city in (SELECT departure_city from (SELECT f4.departure_city FROM flight f4 where f4.arrival_city = ?) natural join (SELECT f5.arrival_city from flight f5 where f5.departure_city = ?) where arrival_city = departure_city)) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D1.flight_number) from DETAIL D1 where D1.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ?)";
 				updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1,arrive);
 				updateStatement.setString(2,arrive);
 				updateStatement.setString(3,depart);
+				updateStatement.setString(4,depart);
+				updateStatement.setString(5,arrive);
+				updateStatement.setDate(6,date);
 				updateStatement.executeUpdate();
 				resultSet2 = updateStatement.executeQuery(query);
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city
@@ -853,14 +859,17 @@ public class Menu {
 							"\n Departure City: " + resultSet2.getString(4) +
 							"\n Arrival Time: " + resultSet2.getString(3) +
 							"\n Arrival City: " + arrive);
+						flight_connection = true;
 					}
 				}
 				System.out.println(""); // For formatting
 			}
-*/		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
+			if(!flight_connection) // Display only if no connected flights were found
+				System.out.println("No connected flights between " + depart + " -> " + arrive + ".\n");
+		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
-	// Customer Command #7 - WORK IN PROGRESS: NEEDS TO CHECK AVAILABLE SEATING
+	// Customer Command #7
 	public void cus7(String depart, String arrive, String dateInput, String airline) {
 		// Convert date
 		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
@@ -869,46 +878,59 @@ public class Menu {
 		} catch(Exception e) {System.out.println("INVALID DATE");}
 		try {
 			// Get direct flights
-			query = "SELECT flight_number, departure_time, arrival_time FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND arrival_city = ? and airline_name = ?";
+			query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.airline_id FROM (detail d full join flight f on d.flight_number = f.flight_number) full join airline a on f.airline_id = a.airline_id where f.flight_number in (select F1.flight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.departure_city = ? AND F2.arrival_city = ?) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ? and airline_name = ?)";
 			PreparedStatement updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1,depart);
 			updateStatement.setString(2,arrive);
-			updateStatement.setString(3,airline);
+			updateStatement.setString(3,depart);
+			updateStatement.setString(4,arrive);
+			updateStatement.setDate(5,date);
+			updateStatement.setString(6,airline);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
-			System.out.println("\nAll direct routes between " + depart + " -> " + arrive + " for airline " + airline + ":");
 			int counter = 1;
 			while(resultSet.next()) {
+				if(counter == 1) // Display only if first time, but not at all if no direct routes
+					System.out.println("\nAll direct routes between " + depart + " -> " + arrive + " for airline " + airline + ":");
 				System.out.println(
 					"Route " + counter + ": " +
 					"\n Flight number: " + resultSet.getString(1) +
 					"\n Departure Time: " + resultSet.getString(2) +
-					"\n Arrival Time: " + resultSet.getString(3));
+					"\n Arrival Time: " + resultSet.getString(3) + "\n");
 				counter++;
 			}
+			if(counter == 1) // Display only if we found no direct routes
+				System.out.println("\nNo direct routes between " + depart + " -> " + arrive + " for airline " + airline + ".\n");
 			// Get connected flights
-			query = "SELECT f.airline_id, f.flight_number, f.departure_time, f.arrival_time, f.arrival_city FROM flight f full join airline a on f.airline_id = a.airline_id WHERE departure_city = ? AND airline_name = ? AND arrival_city in (SELECT arrival_city from (SELECT f1.arrival_city FROM flight f1 where f1.departure_city = ?) natural join (SELECT f2.departure_city from flight f2 where f2.arrival_city = ?) where arrival_city = departure_city)";
+			flight_connection = false;
+			query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.arrival_city, f.airline_id FROM (detail d full join flight f on d.flight_number = f.flight_number) full join airline a on f.airline_id = a.airline_id where f.flight_number in (select F1.flight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.departure_city = ? AND F2.arrival_city in (SELECT arrival_city from (SELECT f4.arrival_city FROM flight f4 where f4.departure_city = ?) natural join (SELECT f5.departure_city from flight f5 where f5.arrival_city = ?) where arrival_city = departure_city)) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D1.flight_number) from DETAIL D1 where D1.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ? AND a.airline_name = ?)";
 			updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1,depart);
-			updateStatement.setString(2,airline);
-			updateStatement.setString(3,depart);
-			updateStatement.setString(4,arrive);
+			updateStatement.setString(2,depart);
+			updateStatement.setString(3,arrive);
+			updateStatement.setString(4,depart);
+			updateStatement.setString(5,arrive);
+			updateStatement.setDate(6,date);
+			updateStatement.setString(7,airline);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
-			while(resultSet.next()) { // This loop goes through all legs with stated departure city and airport
-				query = "SELECT f.airline_id, f.flight_number, f.departure_time, f.arrival_time, f.departure_city FROM flight f full join airline a on f.airline_id = a.airline_id WHERE arrival_city = ? AND airline_name = ? AND departure_city in (SELECT departure_city from (SELECT f1.departure_city FROM flight f1 where f1.arrival_city = ?) natural join (SELECT f2.arrival_city from flight f2 where f2.departure_city = ?) where arrival_city = departure_city)";
+			while(resultSet.next()) { // This loop goes through all legs with stated departure city
+				query = "SELECT f.flight_number, f.departure_time, f.arrival_time, f.departure_city, f.airline_id FROM (detail d full join flight f on d.flight_number = f.flight_number) full join airline a on f.airline_id = a.airline_id where f.flight_number in (select F1.flight_number from FLIGHT F1, PLANE where F1.flight_number in (select F2.flight_number from flight F2 where F2.arrival_city = ? AND F2.departure_city in (SELECT departure_city from (SELECT f4.departure_city FROM flight f4 where f4.arrival_city = ?) natural join (SELECT f5.arrival_city from flight f5 where f5.departure_city = ?) where arrival_city = departure_city)) AND F1.plane_type = plane.plane_type AND plane.plane_capacity > (select count(D1.flight_number) from DETAIL D1 where D1.flight_number in (select F3.flight_number from flight F3 where F3.departure_city = ? AND F3.arrival_city = ?)) AND flight_date = ? AND a.airline_name = ?)";
 				updateStatement = connection.prepareStatement(query);
 				updateStatement.setString(1,arrive);
-				updateStatement.setString(2,airline);
-				updateStatement.setString(3,arrive);
+				updateStatement.setString(2,arrive);
+				updateStatement.setString(3,depart);
 				updateStatement.setString(4,depart);
+				updateStatement.setString(5,arrive);
+				updateStatement.setDate(6,date);
+				updateStatement.setString(7,airline);
 				updateStatement.executeUpdate();
-				resultSet2 = statement.executeQuery(query);
+				resultSet2 = updateStatement.executeQuery(query);
 				while(resultSet2.next()) { // This loop goes through all legs with stated arrival city and airport
 					// If arrival city of leg one matches departure city of leg two, we have a valid connection!
 					if(resultSet.getString(4).equals(resultSet2.getString(4))) {
 						System.out.println(
-							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + ":" +
+							"\nRoute with connection: " + depart + " -> " + resultSet.getString(4) + " -> " + arrive + " for airline " + airline + ":" +
 							"\nFirst Leg:" +
 							"\n Flight number: " + resultSet.getString(1) +
 							"\n Departure Time: " + resultSet.getString(2) +
@@ -921,10 +943,13 @@ public class Menu {
 							"\n Departure City: " + resultSet2.getString(4) +
 							"\n Arrival Time: " + resultSet2.getString(3) +
 							"\n Arrival City: " + arrive);
+						flight_connection = true;
 					}
 				}
-				System.out.println(""); // For formatting
+			System.out.println(""); // For formatting
 			}
+			if(!flight_connection) // Display only if no connected flights were found
+				System.out.println("No connected flights between " + depart + " -> " + arrive + " for airline " + airline + ".\n");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
