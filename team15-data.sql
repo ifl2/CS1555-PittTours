@@ -78,7 +78,7 @@ insert into flight values('002', '003', 'A350', 'MCO', 'ATL', '1010', '0320', 'S
 insert into flight values('003', '009', 'C090', 'CLT', 'MCO', '0900', '1740', 'SMT-TFS');
 insert into flight values('004', '009', 'A150', 'DFW', 'MIA', '2250', '0420', '-MTW--S');
 insert into flight values('005', '008', 'B233', 'JFK', 'LAX', '2260', '1450', 'SMTWTFS');
-insert into flight values('006', '002', 'D200', 'LAS', 'MSP', '0650', '0110', 'S--WTFS');
+insert into flight values('006', '003', 'A250', 'LAS', 'MSP', '0650', '0110', 'S--WTFS');
 insert into flight values('007', '006', 'C100', 'MSP', 'PHX', '0580', '1020', '-MTWTF-');
 insert into flight values('008', '004', 'D400', 'SFO', 'LAS', '1180', '0530', 'SMTW-FS');
 insert into flight values('009', '009', 'A200', 'IAH', 'LAS', '0850', '1350', 'SMTWTFS');
@@ -498,7 +498,7 @@ insert into customer values('588855965', 'Mrs', 'Le',         'Shadle',      '66
 insert into customer values('361054063', 'Mrs', 'Felisha',    'Mitchel',     '1140117927331712', to_date('05/2017', 'MM/YYYY'), 'Street36', 'Las Vegas',        'NV', '5558731232', 'FeMi63@email.com', 'null');
 insert into customer values('201827992',  'Ms', 'Argentina',  'Adelman',     '7516871596299021', to_date('01/2018', 'MM/YYYY'), 'Street20', 'Arlington',        'TX', '5559605278', 'ArAd92@email.com', '009' );
 insert into customer values('123456789',  'Ms', 'Nettie',     'Twitchell',   '7050194499100249', to_date('12/2020', 'MM/YYYY'), 'Street12', 'Omaha',            'NE', '5552036978', 'NeTw89@email.com', 'null');
-insert into customer values('987654321',  'Ms', 'Bill',       'Bob',         '5138465813536888', to_date('10/2019', 'MM/YYYY'), 'Street98', 'Long Beach',       'CA', '5556462254', 'BiBo21@email.com', '007' );
+insert into customer values('987654321',  'Mr', 'Bill',       'Bob',         '5138465813536888', to_date('10/2019', 'MM/YYYY'), 'Street98', 'Long Beach',       'CA', '5556462254', 'BiBo21@email.com', '007' );
 
 
 /* 300 RESERVATIONS
