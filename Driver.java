@@ -50,7 +50,7 @@ public class Driver {
 	public void driverMenu() {
 		System.out.println(
 			"\nSelect Driver run option:" +
-			"\n1: Demonstration (run through each command once)" +
+			"\n1: Demonstration (run through each command with success/fail tests)" +
 			"\n2: Benchmark (run through commands extensively)" +
 			"\n3: Delete Database (seperated to prevent unwanted deletion)" +
 			"\n4: Quit\n");
@@ -80,40 +80,79 @@ public class Driver {
 	//////////////////////////////////////////////////////////
 
 	public void runDemonstration() {
-		System.out.println("\nA2: LOADING AIRLINES...");
+		System.out.print(
+			"\nA/C is Admin/Customer command, which is followed by command number" +
+			"\n  (A1 is Administrator Command #1)" +
+			"\nS/F is a command that should Succeed/Fail given the provided data files" +
+			"\n  (A1|S is an administrator command that should succeed)" +
+			"\nAny text output not followed by '...' comes from Menu, not this Driver" +
+			"\nPress Enter to Continue...");
+		scan.nextLine();
+		System.out.println("\n\nA2|S: LOADING AIRLINES...");
 		menu.adm2("airlines.txt");
-		System.out.println("\nA3: LOADING FLIGHTS...");
+		System.out.println("\nA2|F: LOADING AIRLINES (nonexistent file)...");
+		menu.adm2("airswines.txt");
+		System.out.println("\nA2|F: LOADING AIRLINES (invalid statements)...");
+		menu.adm2("flights.txt");
+		System.out.println("\nA3|S: LOADING FLIGHTS...");
 		menu.adm3("flights.txt");
-		System.out.println("\nA5: LOADING PLANES...");
+		System.out.println("\nA5|S: LOADING PLANES...");
 		menu.adm5("planes.txt");
-		System.out.println("\nA4L: LOADING PRICES...");
+		System.out.println("\nA4L|S: LOADING PRICES...");
 		menu.adm4L("prices.txt");
-		System.out.println("\nA4C: CHANGING FLIGHT PRICE...");
+		System.out.println("\nA4C|S: CHANGING FLIGHT PRICE...");
 		menu.adm4C("LAX", "LAS", 250, 200);
-		System.out.print("\nA6: GENERATING PASSENGER MANIFEST...");
+		System.out.println("\nA4C|F: CHANGING FLIGHT PRICE (low_price > high_price)...");
+		menu.adm4C("LAX", "LAS", 200, 250);
+		System.out.println("\nA6|S: GENERATING PASSENGER MANIFEST...");
 		menu.adm6("000", "12/25/2016");
-		System.out.println("C1: ADDING CUSTOMER...");
+		System.out.println("\nA6|F: GENERATING PASSENGER MANIFEST (invalid date format)...");
+		menu.adm6("000", "January, 15, 2016");
+		System.out.println("\nA6|F: GENERATING PASSENGER MANIFEST (invalid flight number)...");
+		menu.adm6("999", "12/25/2016");
+		System.out.println("C1|S: ADDING CUSTOMER...");
 		menu.cus1("Mr", "John", "Smith", "Main Street", "CityTown", "NY", "5551234567", "js@email.com", "123123123", "02/20");
-		System.out.print("C2: SHOWING CUSTOMER INFO...");
-		menu.cus2("John", "Smith");
-		System.out.print("C3: CHECKING FLIGHT PRICE...");
+		System.out.println("C1|F: ADDING CUSTOMER (invalid salutation)...");
+		menu.cus1("Mr.", "John", "Smith", "Main Street", "CityTown", "NY", "5551234567", "js@email.com", "123123123", "02/20");
+		System.out.println("C2|S: SHOWING CUSTOMER INFO...");
+		menu.cus2("Bill", "Bob");
+		System.out.println("C2|F: SHOWING CUSTOMER INFO (invalid customer)...");
+		menu.cus2("abcde", "fghij");
+		System.out.println("C3|S: CHECKING FLIGHT PRICE...");
 		menu.cus3("LAS", "JFK");
-		System.out.println("C4: SHOWING AVAILABLE ROUTES...");
+		System.out.println("C3|F: CHECKING FLIGHT PRICE (invalid cities)...");
+		menu.cus3("LAM", "JFM");
+		System.out.println("C4|S: SHOWING AVAILABLE ROUTES...");
 		menu.cus4("LAS", "JFK");
-		System.out.println("\nC5: SHOWING ROUTES WITH SEATING ON DATE...");
-		menu.cus5("LAS", "JFK", "Airline005");
-		System.out.println("\nC6: SHOWING AVAILABLE ROUTES...");
+		System.out.println("C4|F: SHOWING AVAILABLE ROUTES (invalid cities)...");
+		menu.cus4("LAM", "JFK");
+		System.out.println("\nC5|S: SHOWING ROUTES WITH SEATING ON DATE...");
+		menu.cus5("LAX", "MSP", "Airline003");
+		System.out.println("\nC5|F: SHOWING ROUTES WITH SEATING ON DATE (no routes on airline)...");
+		menu.cus5("LAX", "MSP", "Airline005");
+		System.out.println("\nC5|F: SHOWING ROUTES WITH SEATING ON DATE (invalid city, no routes)...");
+		menu.cus5("LAX", "MAX", "Airline003");
+		System.out.println("\nC6|S: SHOWING AVAILABLE ROUTES...");
 		menu.cus6("LAX", "MSP", "12/25/2016");
-		System.out.println("\nC7: SHOWING ROUTES WITH SEATING GIVEN AIRLINE ON DATE...");
+		System.out.println("\nC6|F: SHOWING AVAILABLE ROUTES (missing year in date)...");
+		menu.cus6("LAX", "MSP", "12/25");
+		System.out.println("\nC6|F: SHOWING AVAILABLE ROUTES (invalid city, no routes)...");
+		menu.cus6("LAX", "MAX", "12/25/2016");
+		System.out.println("\nC7|S: SHOWING ROUTES WITH SEATING GIVEN AIRLINE ON DATE...");
 		menu.cus7("LAX", "MSP", "12/25/2016", "Airline003");
+		System.out.println("\nC7|F: SHOWING ROUTES WITH SEATING GIVEN AIRLINE ON DATE (no routes on airline)...");
+		menu.cus7("LAX", "MSP", "12/25/2016", "Airline005");
 		//System.out.println("C8: ADDING RESERVAION...");
 		//menu.cus8(); // Add once command is complete
-		System.out.print("\nC9: SHOWING RESERVATION INFO...");
+		System.out.println("\nC9|S: SHOWING RESERVATION INFO...");
 		menu.cus9("00000");
-		System.out.println("\nC10: BUYING TICKET FOR RESERVATION...");
+		System.out.println("\nC9|F: SHOWING RESERVATION INFO (reservation does not exist)...");
+		menu.cus9("99999");
+		System.out.println("\nC10|S: BUYING TICKET FOR RESERVATION...");
 		menu.cus10("00000");
-		System.out.println("\nDEMONSTRATION COMPLETE");
-		System.out.print("Press Enter to Continue... ");
+		System.out.println("\nC10|F: BUYING TICKET FOR RESERVATION (reservation does not exist)...");
+		menu.cus10("99999");
+		System.out.print("\nDEMONSTRATION COMPLETE: Press Enter to Continue... ");
 		scan.nextLine();
 		driverMenu();
 	}
@@ -140,8 +179,7 @@ public class Driver {
 		System.out.print("\nA6: GENERATING PASSENGER MANIFESTS...");
 		runadm6();
 		// Finish customer benchmarks
-		System.out.println("\nBENCHMARK COMPLETE");
-		System.out.print("Press Enter to Continue... ");
+		System.out.print("\nBENCHMARK COMPLETE: Press Enter to Continue... ");
 		scan.nextLine();
 		driverMenu();
 	}
