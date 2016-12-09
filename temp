@@ -636,6 +636,115 @@ resultSet = statement.executeQuery(query);
 
 8#
 
+//CHECK IF THERE IS AVAILABLE SEAT IN FLIGHT 1
+
+select flight_number from flight f1, plane where f1.flight_number = 1? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = 1?
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, flight1);
+      updateStatement.setString(2, flight1); 
+      updateStatement.executeUpdate();
+
+//CHECK IF THERE IS AVAILABLE SEAT IN FLIGHT 2
+
+select flight_number from flight f1, plane where f1.flight_number = 2? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = 2?
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, flight2);
+      updateStatement.setString(2, flight2); 
+      updateStatement.executeUpdate();
+
+//CHECK IF THERE IS AVAILABLE SEAT IN FLIGHT 3
+
+select flight_number from flight f1, plane where f1.flight_number = 3? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = 3?
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, flight3);
+      updateStatement.setString(2, flight3); 
+      updateStatement.executeUpdate();
+
+//CHECK IF THERE IS AVAILABLE SEAT IN FLIGHT 4
+
+select flight_number from flight f1, plane where f1.flight_number = 4? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = 4?
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, flight4);
+      updateStatement.setString(2, flight4); 
+      updateStatement.executeUpdate();
+
+//USE THE INFO FROM ABOVE QUERIES TO CHECK IF RESERVATION CAN BE MADE
+
+if( flight 1 is available and flight 2 and flight 3 and flight 4)
+{
+//add reservation
+
+//generate unique reservation number ( R_num)
+
+// Ask user for CID (cid)
+System.out.println(" Please enter CID)");
+String cid = scan.nextLine();
+
+//calculate price
+query = " select SUM(p1.low_price) as new_cost from (((FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) where f1.flight_number = 1?
+AND f1.flight_number = 2? AND f1.flight_number = 3? AND f1.flight_number = 4?
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1, flight1);
+      updateStatement.setString(2, flight2); 
+      updateStatement.setString(1, flight3);
+      updateStatement.setString(2, flight4); 
+      updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+
+int price = resultSet.getString(1)
+
+// get credit card
+
+query = " select credit_card_num from customer where cid = ?";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,cid);
+  updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+
+int card_num = resultSet.getString(1)
+
+
+//get actual date into variable date
+
+//get start city
+query = "SELECT departure_city from flight where flight_number = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,flight1); //first flight 
+  updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+
+int start = resultSet.getString(1)
+
+//get end city
+
+query = "SELECT arrival_city from flight where flight_number = ?"
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,flight4); //last flight 
+  updateStatement.executeUpdate();
+
+resultSet = statement.executeQuery(query);
+
+int start = resultSet.getString(1)
+
+//ticketed
+tick = 'Y'
+
+query = "INSERT INTO reservation VALUES(?,?,?,?,?,?,?,?)";
+PreparedStatement updateStatement = connection.prepareStatement(query);
+      updateStatement.setString(1,R_num);
+      updateStatement.setString(2,cid);
+      updateStatement.setString(3,price);
+      updateStatement.setString(4,card_num);
+      updateStatement.setString(5,date); 
+      updateStatement.setString(6,start); 
+      updateStatement.setString(7,end); 
+      updateStatement.setString(8,tick);    
+      updateStatement.executeUpdate();
+
+
 
 9#
 
