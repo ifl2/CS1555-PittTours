@@ -399,12 +399,15 @@ public class Menu {
 			try { // Insert into airline table
 				while((strLine = br.readLine()) != null) {
 					String[] tokens = strLine.split(",");
+					int year_founded = 0;
+					try { year_founded = Integer.parseInt(tokens[3]);
+					} catch(NumberFormatException e) {System.out.println("STATEMENT CONTAINS INVALID DATA");}
 					query = "insert into AIRLINE values(?,?,?,?)";
 					PreparedStatement updateStatement = connection.prepareStatement(query);
 					updateStatement.setString(1,tokens[0]);
 					updateStatement.setString(2,tokens[1]);
 					updateStatement.setString(3,tokens[2]);
-					updateStatement.setInt(4,Integer.parseInt(tokens[3]));
+					updateStatement.setInt(4,year_founded);
 					updateStatement.executeUpdate();
 				}
 				System.out.println("AIRLINES LOADED");
@@ -594,6 +597,7 @@ public class Menu {
 			updateStatement.setString(2,last);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
+			boolean customer_exists = false;
 			while(resultSet.next()) {
 				System.out.println(
 					"\n CID: " + resultSet.getString(1) +
@@ -608,7 +612,10 @@ public class Menu {
 					"\n Phone Number: " + resultSet.getString(10) +
 					"\n Email: " + resultSet.getString(11) +
 					"\n Frequent Miles: " +resultSet.getString(12) + "\n");
+				customer_exists = true;
 			}
+			if(!customer_exists)
+				System.out.println("\nNo customer with that name exists");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
@@ -624,12 +631,14 @@ public class Menu {
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
 			System.out.println(""); // For formatting
-			while(resultSet.next()) {
+			if(resultSet.next()) {
 				System.out.println(one + " -> " + two);
 				System.out.println(" High Price: " + resultSet.getString(1) + "\n Low Price: " + resultSet.getString(2));
 				highSum1 = Integer.parseInt(resultSet.getString(1));
 				lowSum1 = Integer.parseInt(resultSet.getString(2));
 			}
+			else
+				System.out.println("No pricing entry found for " + one + " -> " + two + ".");
 			// City 2 -> City 1
 			query = "select high_price, low_price from price where arrival_city = ? and departure_city = ?";
 			updateStatement = connection.prepareStatement(query);
@@ -637,17 +646,19 @@ public class Menu {
 			updateStatement.setString(2,one);
 			updateStatement.executeUpdate();
 			resultSet = updateStatement.executeQuery(query);
-			while(resultSet.next()) {
+			if(resultSet.next()) {
 				System.out.println(two + " -> " + one);
 				System.out.println(" High Price: " + resultSet.getString(1) + "\n Low Price: " + resultSet.getString(2));
 				highSum2 = Integer.parseInt(resultSet.getString(1));
 				lowSum2 = Integer.parseInt(resultSet.getString(2));
+				// Get round trip prices
+				highSum1 = highSum1 + highSum2;
+				lowSum1 = lowSum1 + lowSum2;
+				System.out.println("Round Trip from " + one + " to " + two + ":");
+				System.out.println(" High Price: " + highSum1 + "\n Low Price: " + lowSum1 + "\n");
 			}
-			// Get round trip prices
-			highSum1 = highSum1 + highSum2;
-			lowSum1 = lowSum1 + lowSum2;
-			System.out.println("Round Trip from " + one + " to " + two + ":");
-			System.out.println(" High Price: " + highSum1 + "\n Low Price: " + lowSum1 + "\n");
+			else
+				System.out.println("No pricing entry found for " + two + " -> " + one + ".");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
@@ -1000,12 +1011,23 @@ public class Menu {
 
 	// Customer Command #10
 	public void cus10(String num) {
-		try { // Update ticketed status
-			query = "update reservation set ticketed = 'Y' where reservation_number = ?";
+		try {
+			// Make sure reservation exists
+			query = "select reservation_number from reservation where reservation_number = ?";
 			PreparedStatement updateStatement = connection.prepareStatement(query);
 			updateStatement.setString(1, num);
 			updateStatement.executeUpdate();
-			System.out.println("TICKET STATUS CHANGED TO PURCHASED");
+			resultSet = updateStatement.executeQuery(query);
+			if(resultSet.next()) { // Change status if reservation exists
+				// Update ticketed status
+				query = "update reservation set ticketed = 'Y' where reservation_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1, num);
+				updateStatement.executeUpdate();
+				System.out.println("TICKET STATUS CHANGED TO PURCHASED");
+			}
+			else
+				System.out.println("RESERVATION DOES NOT EXIST");
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
