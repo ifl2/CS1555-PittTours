@@ -62,9 +62,9 @@ begin
 end;
 /
 
-create or replace trigger planeUpgrade
-on DETAIL
-instead of update
+create or replace trigger planeUpgrade 
+before insert
+on DETAIL 
 for each row
 declare
 	flight_n varchar(3);
