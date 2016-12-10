@@ -143,8 +143,8 @@ where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-M
 			from FLIGHT
 			where flight.flight_number = (
 				select detail.flight_number from DETAIL
-				where reservation_number = :new.reservation_number
-				and flight_number = :new.flight_number)
+				where detail.reservation_number = :new.reservation_number
+				and detail.flight_number = :new.flight_number)
 			order by plane_capacity desc
 			fetch first row only));
 end;
