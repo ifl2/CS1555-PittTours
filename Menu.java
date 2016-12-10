@@ -1243,6 +1243,7 @@ public class Menu {
 				updateStatement.setDate(3,date4);
 				updateStatement.setInt(4,leg);
 				updateStatement.executeUpdate();
+				leg++;
 			}
 			System.out.println(
 				"Reservation made for cid: " + cid + ": " +
@@ -1251,9 +1252,9 @@ public class Menu {
 				"\n Starting City: " + startC +
 				"\n Ending City: " + endC +
 				"\n Number of Legs: " + leg +
-				"\nThank you for reserving!");
+				"\nThank you for reserving!\n");
 
-		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString()); Ex.printStackTrace();}
+		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
 	// Customer Command #9
@@ -1312,4 +1313,3 @@ public class Menu {
 		System.exit(0);
 	}
 }
-//EOF
