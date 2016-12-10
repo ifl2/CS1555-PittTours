@@ -161,6 +161,6 @@ begin
 	set cost = (cost * 0.9)
 	where cid = (
 		select cid from CUSTOMER
-		where frequent_miles != null);
+		where frequent_miles != null) AND reservation_number = :new.reservation_number;
 end;
 /
