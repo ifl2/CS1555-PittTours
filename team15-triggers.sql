@@ -13,29 +13,28 @@ after update of low_price
 on PRICE
 for each row
 begin
-	create or replace view PRICE_VIEW as
-		select r.reservation_number, SUM(r.cost) as new_cost
-		from (((FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city
-		and p1.arrival_city=f1.arrival_city) full join DETAIL d1 on f1.flight_number = d1.flight_number) full join RESERVATION r on d1.reservation_number=r.reservation_number)
-		where d1.reservation_number in (
-			select d.reservation_number
-			from (price p full join FLIGHT f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join DETAIL d on f.flight_number = d.flight_number
-			where p.departure_city=:new.departure_city
-			and p.arrival_city=:new.arrival_city)
-		group by r.reservation_number;
-		
+	create or replace trigger adjustTicket
+after update of low_price
+on PRICE
+for each row
+begin
 
-
-	update RESERVATION R4
-	set R4.cost = (select new_cost from PRICE_VIEW pw where pw.reservation_number= R4.reservation_number)
-	where R4.reservation_number IN (
-		select reservation_number
-		from PRICE_VIEW)
-	and 'N' IN (
-		select ticketed from RESERVATION R1
-		where R1.reservation_number IN (
-			select reservation_number 
-			from PRICE_VIEW));
+update RESERVATION R4 set R4.cost = (select new_price from (select r.reservation_number numb, 
+SUM(low_price) as new_price from ((reservation r full join detail d on r.reservation_number =
+ d.reservation_number) full join (flight f full join price p on 
+p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) on d.flight_number =
+ f.flight_number) where r.reservation_number in (select d.reservation_number from (price p 
+full join FLIGHT f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join
+ DETAIL d on f.flight_number = d.flight_number where p.departure_city=:new.departure_city and p.arrival_city
+ =:new.arrival_city) group by r.reservation_number)) where
+ R4.reservation_number IN numb (select d.reservation_number from (price p 
+full join FLIGHT f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join
+DETAIL d on f.flight_number = d.flight_number where p.departure_city=:new.departure_city and p.arrival_city =
+ :new.arrival_city) and 'N' IN ( select ticketed from RESERVATION R1 where R1.reservation_number IN (select
+ d.reservation_number from (price p full join FLIGHT f on p.departure_city=f.departure_city and
+ p.arrival_city=f.arrival_city) full join DETAIL d on f.flight_number = d.flight_number where
+ p.departure_city=:new.departure_city and p.arrival_city = :new.arrival_city));
+ 
 end;
 /
 
