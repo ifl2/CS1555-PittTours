@@ -11,12 +11,11 @@ Files:
 - team15-db.sql: Table setup
 - team15-data.sql: Insert values into tables
 - team15-triggers.sql: Trigger setup
-- Setup.sql: Runs the above three sql files
 - Menu.java: Interface for admin and customer commands
 - Driver.java: Driver to test Menu
 - airlines.txt: Sample data file
-- airlines2.txt: Large sample data file
+- airlines2.txt: Large sample data file for driver
 - flights.txt: Sample data file
 - planes.txt: Sample data file
 - prices.txt: Sample data file
-- temp: Temporary workspace to be merged
+- temp: Temporary workspace
