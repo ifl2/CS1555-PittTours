@@ -311,42 +311,105 @@ public class Menu {
 			cus7(depart, arrive, date, airline);
 		}
 		else if(choice == 8) {
-			String flightN1 = null, flightN2 = null, flightN3 = null, flightN4 = null;
+			// Flight numbers
+			String flight1 = null, flight2 = null, flight3 = null, flight4 = null;
+			// Flight dates
 			String dateN1 = null, dateN2 = null, dateN3 = null, dateN4 = null;
+			// Booleans for if flight is available or wasn't entered
+			boolean flight1A = false, flight2A = false, flight3A = false, flight4A = false;
 			System.out.println("ADDING RESERVATION:\nAdd first flight:");
 			// Get first leg (required)
 			System.out.print(" Flight Number: ");
-			flightN1 = scan.nextLine();
+			flight1 = scan.nextLine();
 			System.out.print(" Departure Date (MM/DD/YYYY): ");
 			dateN1 = scan.nextLine();
 			// Get second leg (optional)
-			System.out.print("\nAdd another leg in this direction? (Y/N): ");
+			System.out.print("Add another leg in this direction? (Y/N): ");
 			inputString = scan.nextLine();
 			if(inputString.equals("Y") || inputString.equals("y")) {
 				System.out.print(" Flight Number: ");
-				flightN2 = scan.nextLine();
+				flight2 = scan.nextLine();
 				System.out.print(" Departure Date (MM/DD/YYYY): ");
 				dateN2 = scan.nextLine();
 			}
 			// Get return trip first leg (optional)
-			System.out.print("\nAdd return trip? (Y/N): ");
+			System.out.print("Add return trip? (Y/N): ");
 			inputString = scan.nextLine();
 			if(inputString.equals("Y") || inputString.equals("y")) {
 				System.out.print(" Flight Number: ");
-				flightN3 = scan.nextLine();
+				flight3 = scan.nextLine();
 				System.out.print(" Departure Date (MM/DD/YYYY): ");
 				dateN3 = scan.nextLine();
 				// Get return trip second leg (optional, requires return trip first leg)
-				System.out.print("\nAdd another leg in this direction? (Y/N): ");
+				System.out.print("Add another leg in this direction? (Y/N): ");
 				inputString = scan.nextLine();
 				if(inputString.equals("Y") || inputString.equals("y")) {
 					System.out.print(" Flight Number: ");
-					flightN4 = scan.nextLine();
+					flight4 = scan.nextLine();
 					System.out.print(" Departure Date (MM/DD/YYYY): ");
 					dateN4 = scan.nextLine();
 				}
 			}
-			cus8(flightN1, flightN2, flightN3, flightN4, dateN1, dateN2, dateN3, dateN4);
+			try { // Check if seats are available in non-null flights
+				PreparedStatement updateStatement;
+				if(flight2 != null && !flight1.isEmpty()) { // Check if flight1 seat is available
+					query = "select flight_number from flight f1, plane where f1.flight_number = ? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = ?)";
+					updateStatement = connection.prepareStatement(query);
+					updateStatement.setString(1,flight1);
+					updateStatement.setString(2,flight1);
+					updateStatement.executeUpdate();
+					resultSet = updateStatement.executeQuery(query);
+					if(resultSet.next())
+						flight1A = true;
+				}
+				else
+					flight1A = true;
+				if(flight2 != null && !flight2.isEmpty()) { // Check if flight2 seat is available
+					query = "select flight_number from flight f1, plane where f1.flight_number = ? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = ?)";
+					updateStatement = connection.prepareStatement(query);
+					updateStatement.setString(1,flight2);
+					updateStatement.setString(2,flight2);
+					updateStatement.executeUpdate();
+					resultSet = updateStatement.executeQuery(query);
+					if(resultSet.next())
+						flight2A = true;
+				}
+				else
+					flight2A = true;
+				if(flight3 != null && !flight3.isEmpty()) { // Check if flight3 seat is available
+					query = "select flight_number from flight f1, plane where f1.flight_number = ? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = ?)";
+					updateStatement = connection.prepareStatement(query);
+					updateStatement.setString(1,flight3);
+					updateStatement.setString(2,flight3);
+					updateStatement.executeUpdate();
+					resultSet = updateStatement.executeQuery(query);
+					if(resultSet.next())
+						flight3A = true;
+				}
+				else
+					flight3A = true;
+				if(flight4 != null && !flight4.isEmpty()) { // Check if flight4 seat is available
+					query = "select flight_number from flight f1, plane where f1.flight_number = ? AND plane.plane_capacity > (select count(D.flight_number) from DETAIL D where D.flight_number = ?)";
+					updateStatement = connection.prepareStatement(query);
+					updateStatement.setString(1,flight4);
+					updateStatement.setString(2,flight4);
+					updateStatement.executeUpdate();
+					resultSet = updateStatement.executeQuery(query);
+					if(resultSet.next())
+						flight4A = true;
+				}
+				else
+					flight4A = true;
+				// If all non-null flights are available, get cid and call cus8 to gather data and make reservation
+				if(flight1A && flight2A && flight3A && flight4A) {
+					// Get customer CID
+					System.out.print("Seating available!\n Please enter CID: ");
+					String cid = scan.nextLine();
+					cus8(flight1, flight2, flight3, flight4, dateN1, dateN2, dateN3, dateN4, cid);
+				}
+				else
+					System.out.println("SEATING UNAVAILABLE ON ONE OR MORE FLIGHTS");
+			} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 		}
 		else if(choice == 9) {
 			System.out.print("Please enter reservation number: ");
@@ -452,13 +515,19 @@ public class Menu {
 			try { // Insert into price table
 				while((strLine = br.readLine()) != null) {
 					String[] tokens = strLine.split(",");
+					int high_price = 0;
+					try { high_price = Integer.parseInt(tokens[3]);
+					} catch(NumberFormatException e) {System.out.println("STATEMENT CONTAINS INVALID DATA");}
+					int low_price = 0;
+					try { high_price = Integer.parseInt(tokens[4]);
+					} catch(NumberFormatException e) {System.out.println("STATEMENT CONTAINS INVALID DATA");}
 					query = "insert into PRICE values(?,?,?,?,?)";
 					PreparedStatement updateStatement = connection.prepareStatement(query);
 					updateStatement.setString(1,tokens[0]);
 					updateStatement.setString(2,tokens[1]);
 					updateStatement.setString(3,tokens[2]);
-					updateStatement.setInt(4,Integer.parseInt(tokens[3]));
-					updateStatement.setInt(5,Integer.parseInt(tokens[4]));
+					updateStatement.setInt(4,high_price);
+					updateStatement.setInt(5,low_price);
 					updateStatement.executeUpdate();
 				}
 				System.out.println("PRICES LOADED");
@@ -490,6 +559,12 @@ public class Menu {
 			try { // Insert into plane table
 				while((strLine = br.readLine()) != null) {
 					String[] tokens = strLine.split(",");
+					int capacity = 0;
+					try { capacity = Integer.parseInt(tokens[2]);
+					} catch(NumberFormatException e) {System.out.println("STATEMENT CONTAINS INVALID DATA");}
+					int year = 0;
+					try { year = Integer.parseInt(tokens[4]);
+					} catch(NumberFormatException e) {System.out.println("STATEMENT CONTAINS INVALID DATA");}
 					java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
 					java.sql.Date date = null;
 					try { date = new java.sql.Date(df.parse(tokens[3]).getTime());
@@ -498,9 +573,9 @@ public class Menu {
 					PreparedStatement updateStatement = connection.prepareStatement(query);
 					updateStatement.setString(1,tokens[0]);
 					updateStatement.setString(2,tokens[1]);
-					updateStatement.setInt(3,Integer.parseInt(tokens[2]));
+					updateStatement.setInt(3,capacity);
 					updateStatement.setDate(4,date);
-					updateStatement.setInt(5,Integer.parseInt(tokens[4]));
+					updateStatement.setInt(5,year);
 					updateStatement.setString(6,tokens[5]);
 					updateStatement.executeUpdate();
 				}
@@ -964,30 +1039,221 @@ public class Menu {
 		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
 	}
 
-	// Customer Command #8 - WORK IN PROGRESS
+	// Customer Command #8
 	public void cus8(String... inputs) {
 		// Store inputs
-		String flightN1 = inputs[0], flightN2 = inputs[1], flightN3 = inputs[2], flightN4 = inputs[3],
-			dateN1 = inputs[4], dateN2 = inputs[5], dateN3 = inputs[6], dateN4 = inputs[7];
+		String flight1 = inputs[0], flight2 = inputs[1], flight3 = inputs[2], flight4 = inputs[3],
+			dateN1 = inputs[4], dateN2 = inputs[5], dateN3 = inputs[6], dateN4 = inputs[7], cid = inputs[8];
+		// Reservation/Detail variables
+		String r_num = "", card_num, startC, endC, flightL, tick;
+		int cost = 0;
 		// Convert dates if they aren't null
 		java.sql.Date date1 = null, date2 = null, date3 = null, date4 = null;
-		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/yyyy");
+		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
 		try {
-			if(dateN1 != null)
+			if(dateN1 != null && !dateN1.isEmpty())
 				date1 = new java.sql.Date(df.parse(dateN1).getTime());
-			if(dateN2 != null)
+			if(dateN2 != null && !dateN2.isEmpty())
 				date2 = new java.sql.Date(df.parse(dateN2).getTime());
-			if(dateN3 != null)
+			if(dateN3 != null && !dateN3.isEmpty())
 				date3 = new java.sql.Date(df.parse(dateN3).getTime());
-			if(dateN4 != null)
+			if(dateN4 != null && !dateN4.isEmpty())
 				date4 = new java.sql.Date(df.parse(dateN4).getTime());
 		} catch(Exception e) {System.out.println("INVALID DATE");}
-		/*
-		try {
-			// Make reservation, check if values are null to see if a leg is to be added
-			System.out.println("FLIGHT ADDED");
-		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());}
-		*/
+		try{
+			PreparedStatement updateStatement;
+			// Generate a Reservation Number
+			boolean flag = false;
+			while(!flag) {
+				// Generate random 5 digit number
+				char[] chars = "0123456789".toCharArray();
+				Random rnd = new Random();
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < 5; i++)
+					sb.append(chars[rnd.nextInt(chars.length)]);
+				r_num = sb.toString();
+				// Check if random value for r_num already exists in the database
+				query = "select * from RESERVATION where reservation_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,r_num);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				// Exits while loop once we obtain an r_num that doesn't already exist
+				flag = true;
+				if(resultSet.next())
+					flag = false;
+			}
+			// Calculate costs
+			// If only fight1
+			if(!(flight2 != null && !flight2.isEmpty()) && !(flight3 != null && !flight3.isEmpty()) && !(flight4 != null && !flight4.isEmpty())) {
+				query = "select SUM(p1.low_price) as new_cost from (FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) where f1.flight_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,flight1);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				resultSet.next();
+				cost = resultSet.getInt(1);
+			}
+			// If only fight1 & flight2
+			else if(!(flight3 != null && !flight3.isEmpty()) && !(flight4 != null && !flight4.isEmpty())) {
+				query = "select SUM(p1.low_price) as new_cost from (FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) where f1.flight_number = ? or f1.flight_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,flight1);
+				updateStatement.setString(2,flight2);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				resultSet.next();
+				cost = resultSet.getInt(1);
+			}
+			// If only fight1 & flight3
+			else if(!(flight2 != null && !flight2.isEmpty()) && !(flight4 != null && !flight4.isEmpty())) {
+				query = "select SUM(p1.low_price) as new_cost from (FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) where f1.flight_number = ? or f1.flight_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,flight1);
+				updateStatement.setString(2,flight3);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				resultSet.next();
+				cost = resultSet.getInt(1);
+			}
+			// If only fight1 & flight2 & flight3
+			else if(!(flight4 != null && !flight4.isEmpty())) {
+				query = "select SUM(p1.low_price) as new_cost from (FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) where f1.flight_number = ? or f1.flight_number = ? or f1.flight_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,flight1);
+				updateStatement.setString(2,flight2);
+				updateStatement.setString(3,flight3);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				resultSet.next();
+				cost = resultSet.getInt(1);
+			}
+			// If only fight1 & flight3 & flight4
+			else if(!(flight2 != null && !flight2.isEmpty())) {
+				query = "select SUM(p1.low_price) as new_cost from (FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) where f1.flight_number = ? or f1.flight_number = ? or f1.flight_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,flight1);
+				updateStatement.setString(2,flight3);
+				updateStatement.setString(3,flight4);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				resultSet.next();
+				cost = resultSet.getInt(1);
+			}
+			// If all flights
+			else {
+				query = "select SUM(p1.low_price) as new_cost from (FLIGHT f1 full join PRICE p1 on p1.departure_city=f1.departure_city and p1.arrival_city=f1.arrival_city) where f1.flight_number = ? or f1.flight_number = ? or f1.flight_number = ? or f1.flight_number = ?";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,flight1);
+				updateStatement.setString(2,flight2);
+				updateStatement.setString(3,flight3);
+				updateStatement.setString(4,flight4);
+				updateStatement.executeUpdate();
+				resultSet = updateStatement.executeQuery(query);
+				resultSet.next();
+				cost = resultSet.getInt(1);
+			}
+			// Get credit card number of CID
+			query = "select credit_card_num from customer where cid = ?";
+			updateStatement = connection.prepareStatement(query);
+			updateStatement.setString(1,cid);
+			updateStatement.executeUpdate();
+			resultSet = updateStatement.executeQuery(query);
+			resultSet.next();
+			card_num = resultSet.getString(1);
+			// Get start city of first flight
+			query = "SELECT departure_city from flight where flight_number = ?";
+			updateStatement = connection.prepareStatement(query);
+			updateStatement.setString(1,flight1); // First flight
+			updateStatement.executeUpdate();
+			resultSet = updateStatement.executeQuery(query);
+			resultSet.next();
+			startC = resultSet.getString(1);
+			// Determine last flight
+			if(flight4 != null && !flight4.isEmpty())
+				flightL = flight4;
+			else if(flight3 != null && !flight3.isEmpty())
+				flightL = flight3;
+			else if(flight2 != null && !flight2.isEmpty())
+				flightL = flight2;
+			else
+				flightL = flight1;
+			// Get end city of last flight
+			query = "SELECT arrival_city from flight where flight_number = ?";
+			updateStatement = connection.prepareStatement(query);
+			updateStatement.setString(1,flightL); // Last flight
+			updateStatement.executeUpdate();
+			resultSet = updateStatement.executeQuery(query);
+			resultSet.next();
+			endC = resultSet.getString(1);
+			// Ticketed?
+			tick = "N";
+			// Insert reservation
+			query = "INSERT INTO reservation VALUES(?,?,?,?,?,?,?,?)";
+			updateStatement = connection.prepareStatement(query);
+			updateStatement.setString(1,r_num);
+			updateStatement.setString(2,cid);
+			updateStatement.setInt(3,cost);
+			updateStatement.setString(4,card_num);
+			updateStatement.setDate(5,date1); // DATE OF FIRST FLIGHT, INSTEAD MAKE CURRENT DATE
+			updateStatement.setString(6,startC);
+			updateStatement.setString(7,endC);
+			updateStatement.setString(8,tick);
+			updateStatement.executeUpdate();
+			int leg = 0; // Keep track of legs
+			// Insert flight1 if it exists (it should)
+			if(flight1 != null && !flight1.isEmpty()) {
+				query = "INSERT INTO detail VALUES(?,?,?,?)";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,r_num);
+				updateStatement.setString(2,flight1);
+				updateStatement.setDate(3,date1);
+				updateStatement.setInt(4,leg);
+				updateStatement.executeUpdate();
+				leg++;
+			}
+			// Insert flight2 if it exists
+			if(flight2 != null && !flight2.isEmpty()) {
+				query = "INSERT INTO detail VALUES(?,?,?,?)";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,r_num);
+				updateStatement.setString(2,flight2);
+				updateStatement.setDate(3,date2);
+				updateStatement.setInt(4,leg);
+				updateStatement.executeUpdate();
+				leg++;
+			}
+			// Insert flight3 if it exists
+			if(flight3 != null && !flight3.isEmpty()) {
+				query = "INSERT INTO detail VALUES(?,?,?,?)";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,r_num);
+				updateStatement.setString(2,flight3);
+				updateStatement.setDate(3,date3);
+				updateStatement.setInt(4,leg);
+				updateStatement.executeUpdate();
+				leg++;
+			}
+			// Insert flight4 if it exists
+			if(flight4 != null && !flight4.isEmpty()) {
+				query = "INSERT INTO detail VALUES(?,?,?,?)";
+				updateStatement = connection.prepareStatement(query);
+				updateStatement.setString(1,r_num);
+				updateStatement.setString(2,flight4);
+				updateStatement.setDate(3,date4);
+				updateStatement.setInt(4,leg);
+				updateStatement.executeUpdate();
+			}
+			System.out.println(
+				"Reservation made for cid: " + cid + ": " +
+				"\n Your reservation number is: " + r_num +
+				"\n Total Cost: " + cost +
+				"\n Starting City: " + startC +
+				"\n Ending City: " + endC +
+				"\n Number of Legs: " + leg +
+				"\nThank you for reserving!");
+
+		} catch(SQLException Ex) {System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString()); Ex.printStackTrace();}
 	}
 
 	// Customer Command #9
