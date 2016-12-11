@@ -1,3 +1,16 @@
+/* NOTES ON THIS INTERFACE
+	The following interface will first get login information for the database
+		*for this to work, you must first login through sqlplus and set up the database
+		*if the database is setup, you still need to login through sqlplus first
+	All user input is gathered in the displayInterface methods
+	Once all input is obtained and verified, it is passed to the adm/cus methods to run
+	The driver uses the adm/cus methods assuming that the input is generally correct
+		*it will still catch most errors, but a few are tested for during user input
+	After a command is executed, a user-defined pause is added so that you can read...
+	...the command results without the menu appearing again.
+	Exit the program through an exit command to properly close the connection
+*/
+
 import java.sql.*;
 import java.util.*;
 import java.io.*;
@@ -1047,6 +1060,7 @@ public class Menu {
 		// Reservation/Detail variables
 		String r_num = "", card_num, startC, endC, flightL, tick;
 		int cost = 0;
+		double costD = 0;
 		// Convert dates if they aren't null
 		java.sql.Date date1 = null, date2 = null, date3 = null, date4 = null;
 		java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("MM/dd/yyyy");
@@ -1152,6 +1166,19 @@ public class Menu {
 				resultSet = updateStatement.executeQuery(query);
 				resultSet.next();
 				cost = resultSet.getInt(1);
+			}
+			// Check for frequent flyer miles
+			query = "select frequent_miles from customer where cid = ?";
+			updateStatement = connection.prepareStatement(query);
+			updateStatement.setString(1,cid);
+			updateStatement.executeUpdate();
+			resultSet = updateStatement.executeQuery(query);
+			resultSet.next();
+			String frequent = resultSet.getString(1);
+			// Apply 10% discount to reservation cost if a frequent flyer
+			if(!frequent.equals("null")) {
+				costD = (double) cost * 0.9;
+				cost = (int) cost;
 			}
 			// Get credit card number of CID
 			query = "select credit_card_num from customer where cid = ?";
