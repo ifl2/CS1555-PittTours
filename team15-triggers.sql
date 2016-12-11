@@ -40,6 +40,7 @@ end;
 
 /* Trigger 2 */
 
+--Procedure that will count the number of reservation exist for a specific flight number.
 create or replace procedure count_flight(f_number in varchar, a_count out int)
 as
 begin
@@ -49,6 +50,7 @@ begin
 end;
 /
 
+--Function will check if the plane capacity is full, and return True or false
 create or replace function is_full(f_number in varchar, capacity in int)
 return boolean
 as
@@ -62,6 +64,9 @@ begin
 end;
 /
 
+/*trigger created with compilation error*/
+-- Trigger will use the procedure and functions to perform the required task
+ 
 create or replace trigger planeUpgrade 
 before insert
 on DETAIL 
@@ -114,13 +119,12 @@ plane, then the plane for that flight should be switched to the smaller-capacity
 6. use the count to find a smaller plane if possible( select plane_type from PLANE where plane_capacity >= count , sort by min first)
 7. if find a smaller plane, update FLIGHT(where F.plane_type = P.plane_type) */
 
--- BROKEN
+-- Trigger created with compilation error
 create or replace trigger CancelReservation
 after update
 on OUR_DATE
 for each row
-declare
-	flight_c int;
+
 begin
 	delete from RESERVATION R1
 	where R1.reservation_number in ( select R.reservation_number 
@@ -131,8 +135,26 @@ where F.flight_number in ( select F4.flight_number
 from FLIGHT F4 full join RESERVATION R6 on F4.departure_city = R6.start_city and F4.arrival_city = R6.end_city 
 where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-Mon-YY hh:mi') from our_date)))))
 
-	count_flight(flight_n, flight_c);
+end;
+/
+show errors;
 
+/*Trigger 3 part2 */
+
+--Trigger created with compilation error
+--This trigger should check if there is a smaller plane that can fit all the customers for that flight. After there was a deletion
+--on RESERVATION
+
+create or replace trigger UpdateFlight
+after delete
+on RESERVATION
+for each row
+
+declare
+	flight_c int;
+	
+	count_flight(flight_n, flight_c);
+begin
 	update FLIGHT
 	set plane_type = (
 		select plane_type
@@ -150,17 +172,3 @@ where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-M
 end;
 /
 
-
-/*Trigger extra*/
-create or replace trigger ten_percent
-after insert
-on RESERVATION
-for each row
-begin
-	update RESERVATION
-	set cost = (cost * 0.9)
-	where cid = (
-		select cid from CUSTOMER
-		where frequent_miles != null) AND reservation_number = :new.reservation_number;
-end;
-/
