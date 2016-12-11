@@ -11,6 +11,7 @@ Files:
 - team15-db.sql: Table setup
 - team15-data.sql: Insert values into tables
 - team15-triggers.sql: Trigger setup
+- Setup.sql: Runs the above three sql files
 - Menu.java: Interface for admin and customer commands
 - Driver.java: Driver to test Menu
 - airlines.txt: Sample data file
