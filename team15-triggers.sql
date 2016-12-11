@@ -8,38 +8,47 @@ You should create a trigger, called adjustTicket, that adjusts the cost of a res
 5. if ticketed = 'N' update R.cost( find all legs from each reservation, add the D.cost(each leg) and update the final cost( R.cost)*/
 
 -- BROKEN
+/*
 create or replace trigger adjustTicket
 after update of low_price
 on PRICE
 for each row
 begin
-	create or replace trigger adjustTicket
-after update of low_price
-on PRICE
-for each row
-begin
-
-update RESERVATION R4 set R4.cost = (select new_price from (select r.reservation_number numb, 
-SUM(low_price) as new_price from ((reservation r full join detail d on r.reservation_number =
- d.reservation_number) full join (flight f full join price p on 
-p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) on d.flight_number =
- f.flight_number) where r.reservation_number in (select d.reservation_number from (price p 
-full join FLIGHT f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join
- DETAIL d on f.flight_number = d.flight_number where p.departure_city=:new.departure_city and p.arrival_city
- =:new.arrival_city) group by r.reservation_number)) where
- R4.reservation_number IN numb (select d.reservation_number from (price p 
-full join FLIGHT f on p.departure_city=f.departure_city and p.arrival_city=f.arrival_city) full join
-DETAIL d on f.flight_number = d.flight_number where p.departure_city=:new.departure_city and p.arrival_city =
- :new.arrival_city) and 'N' IN ( select ticketed from RESERVATION R1 where R1.reservation_number IN (select
- d.reservation_number from (price p full join FLIGHT f on p.departure_city=f.departure_city and
- p.arrival_city=f.arrival_city) full join DETAIL d on f.flight_number = d.flight_number where
- p.departure_city=:new.departure_city and p.arrival_city = :new.arrival_city));
- 
+	update RESERVATION R4 set R4.cost = (
+		select new_price from (
+			select r.reservation_number numb, SUM(low_price) as new_price from (
+				(reservation r full join detail d on r.reservation_number = d.reservation_number)
+				full join (flight f full join price p on p.departure_city = f.departure_city
+				and p.arrival_city=f.arrival_city) on d.flight_number = f.flight_number)
+			where r.reservation_number in (
+				select d.reservation_number from (
+					price p full join FLIGHT f on p.departure_city = f.departure_city
+					and p.arrival_city = f.arrival_city)
+				full join DETAIL d on f.flight_number = d.flight_number
+				where p.departure_city=:new.departure_city
+				and p.arrival_city =:new.arrival_city)
+			group by r.reservation_number))
+		where R4.reservation_number in numb (
+			select d.reservation_number from (
+				price p full join FLIGHT f on p.departure_city = f.departure_city
+				and p.arrival_city = f.arrival_city)
+			full join DETAIL d on f.flight_number = d.flight_number
+			where p.departure_city = :new.departure_city
+			and p.arrival_city = :new.arrival_city)
+		and 'N' in (
+			select ticketed from RESERVATION R1
+			where R1.reservation_number IN (
+				select d.reservation_number from (
+					price p full join FLIGHT f on p.departure_city = f.departure_city
+					and p.arrival_city = f.arrival_city)
+				full join DETAIL d on f.flight_number = d.flight_number
+				where p.departure_city = :new.departure_city
+				and p.arrival_city = :new.arrival_city));
 end;
 /
+*/
 
 /* Trigger 2 */
-
 --Procedure that will count the number of reservation exist for a specific flight number.
 create or replace procedure count_flight(f_number in varchar, a_count out int)
 as
@@ -50,11 +59,10 @@ begin
 end;
 /
 
---Function will check if the plane capacity is full, and return True or false
+-- Function will check if the plane capacity is full, and return True or false
 create or replace function is_full(f_number in varchar, capacity in int)
 return boolean
-as
-	p_cap int;
+as p_cap int;
 begin
 	select plane.plane_capacity into p_cap
 	from FLIGHT, PLANE
@@ -64,32 +72,27 @@ begin
 end;
 /
 
-/*trigger created with compilation error*/
 -- Trigger will use the procedure and functions to perform the required task
- 
-create or replace trigger planeUpgrade 
+-- Errors, compiles but somehow fetches more than one row even though it is first row only
+/*
+create or replace trigger planeUpgrade
 before insert
-on DETAIL 
+on DETAIL
 for each row
 declare
 	flight_n varchar(3);
 	flight_c int;
 	max_capacity int;
 begin
-	select flight_number into flight_n
-	from DETAIL
+	select flight_number into flight_n from DETAIL
 	where flight_number = :new.flight_number;
-
 	count_flight(flight_n, flight_c);
-
 	if is_full(flight_n, flight_c) then
-		select max(plane_capacity) into max_capacity
-		from PLANE;
+		select max(plane_capacity) into max_capacity from PLANE;
 		if max_capacity >= flight_c then
 			update FLIGHT
 			set plane_type = (
-				select plane_type
-				from PLANE
+				select plane_type from PLANE
 				where plane_capacity > flight_c
 				and owner_id = (
 					select airline_id from FLIGHT
@@ -102,10 +105,9 @@ begin
 			where flight_n = :new.flight_number;
 		end if;
 	end if;
-	Begin
-	RAISERROR(Flight FULL);
 end;
 /
+*/
 
 /* Trigger 3
 You should write a trigger, called cancelReservation, that cancels(deletes)all non-ticketed reservations for a flight, 12 hours prior
@@ -119,50 +121,45 @@ plane, then the plane for that flight should be switched to the smaller-capacity
 6. use the count to find a smaller plane if possible( select plane_type from PLANE where plane_capacity >= count , sort by min first)
 7. if find a smaller plane, update FLIGHT(where F.plane_type = P.plane_type) */
 
+/*
 -- Trigger created with compilation error
 create or replace trigger CancelReservation
 after update
 on OUR_DATE
 for each row
-
 begin
 	delete from RESERVATION R1
-	where R1.reservation_number in ( select R.reservation_number 
-from RESERVATION R
-where (R.ticketed = 'N' and R.reservation_number in (select D.reservation_number
-from FLIGHT F full join DETAIL D on f.flight_number = D.flight_number
-where F.flight_number in ( select F4.flight_number
-from FLIGHT F4 full join RESERVATION R6 on F4.departure_city = R6.start_city and F4.arrival_city = R6.end_city 
-where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-Mon-YY hh:mi') from our_date)))))
-
+	where R1.reservation_number in (
+		select R.reservation_number from RESERVATION R
+		where (R.ticketed = 'N' and R.reservation_number in (
+			select D.reservation_number from FLIGHT F full join DETAIL D on f.flight_number = D.flight_number
+			where F.flight_number in (
+				select F4.flight_number from FLIGHT F4 full join RESERVATION R6 on F4.departure_city = R6.start_city
+				and F4.arrival_city = R6.end_city
+				where (R6.reservation_date < select to_char(c_date + (interval '12' hour) ,'DD-Mon-YY hh:mi') from our_date)))));
 end;
 /
-show errors;
+*/
 
-/*Trigger 3 part2 */
-
---Trigger created with compilation error
---This trigger should check if there is a smaller plane that can fit all the customers for that flight. After there was a deletion
---on RESERVATION
-
+/*
+-- Trigger 3 Part 2
+-- Trigger created with compilation error
+-- This trigger should check if there is a smaller plane that can fit all the customers for that flight.
+-- After there was a deletion on RESERVATION
 create or replace trigger UpdateFlight
 after delete
 on RESERVATION
 for each row
-
 declare
 	flight_c int;
-	
-	count_flight(flight_n, flight_c);
 begin
+	count_flight(flight_n, flight_c);
 	update FLIGHT
 	set plane_type = (
-		select plane_type
-		from PLANE
+		select plane_type from PLANE
 		where plane_capacity >= flight_c
 		and owner_id = (
-			select airline_id
-			from FLIGHT
+			select airline_id from FLIGHT
 			where flight.flight_number = (
 				select detail.flight_number from DETAIL
 				where detail.reservation_number = :new.reservation_number
@@ -171,4 +168,4 @@ begin
 			fetch first row only));
 end;
 /
-
+*/
