@@ -161,9 +161,9 @@ public class Driver {
 		driverMenu();
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//  RUN BENCHMARK : runs each command hundreds of times. File load commands run once but on larger files  //
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//  RUN BENCHMARK : runs commands hundreds of times. File load commands run once but on larger files  //
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public void runBenchmark() {
 		System.out.println("\nA2: TEST LOAD FROM LARGE FILE. LOADING 289 AIRLINES...");
@@ -410,6 +410,7 @@ public class Driver {
 		menu.adm6("094", "09/30/2015");
 		menu.adm6("095", "01/31/2015");
 		menu.adm6("096", "02/28/2016");
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.adm6("097", "04/30/2015");
 		menu.adm6("098", "06/30/2015");
 		menu.adm6("099", "05/31/2016");
@@ -540,6 +541,7 @@ public class Driver {
 		menu.adm6("024", "08/31/2015");
 		menu.adm6("025", "03/31/2015");
 		menu.adm6("026", "06/30/2016");
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.adm6("027", "04/30/2016");
 		menu.adm6("028", "01/31/2016");
 		menu.adm6("029", "11/30/2016");
@@ -740,6 +742,7 @@ public class Driver {
 		menu.cus1( "Mr", "TMerle",      "Hadden",      "Street55", "Las Vegas",        "NV", "1559940069", "MeHa25@email.com", "1665846160031553", "10/2016");
 		menu.cus1( "Mr", "TMiguel",     "Bowland",     "Street51", "Atlanta",          "GA", "1551573843", "MiBo25@email.com", "1468087886671318", "04/2018");
 		menu.cus1( "Mr", "TSalvador",   "Frances",     "Street20", "Omaha",            "NE", "1551892484", "SaFr32@email.com", "1989671174568359", "02/2018");
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.cus1( "Mr", "TSammy",      "Booth",       "Street89", "San Jose",         "CA", "1554701840", "SaBo58@email.com", "1774151791182665", "03/2016");
 		menu.cus1( "Mr", "TPat",        "Ficklin",     "Street52", "Louisville",       "KY", "1554807679", "PaFi25@email.com", "1430891279147659", "09/2016");
 		menu.cus1( "Mr", "TTroy",       "Lustig",      "Street94", "Fresno",           "CA", "1558286370", "TrLu19@email.com", "1954689957623143", "01/2016");
@@ -1335,7 +1338,7 @@ public class Driver {
 		menu.cus5("ATL", "PHX", "Airline001");
 		menu.cus5("DEN", "ORD", "Airline001");
 	}
-	
+
 	public void runcus9() {
 		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.cus9("00010");
@@ -1547,6 +1550,7 @@ public class Driver {
 		menu.cus9("00215");
 		menu.cus9("00216");
 		menu.cus9("00217");
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.cus9("00218");
 		menu.cus9("00219");
 		menu.cus9("00220");
@@ -1630,7 +1634,7 @@ public class Driver {
 		menu.cus9("00298");
 		menu.cus9("00299");
 	}
-	
+
 	public void runcus10() {
 		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.cus10("00010");
@@ -1855,6 +1859,7 @@ public class Driver {
 		menu.cus10("00228");
 		menu.cus10("00229");
 		menu.cus10("00230");
+		menu.resetConnection(); // Reset connection to avoid 'maximum open cursors' error
 		menu.cus10("00231");
 		menu.cus10("00232");
 		menu.cus10("00233");
