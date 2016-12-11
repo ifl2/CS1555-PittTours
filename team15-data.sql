@@ -1,3 +1,17 @@
+/* NOTES ON THIS SAMPLE DATA
+	The following data was generated as specified above each section
+	There are discontinuity errors in the data, but it works for general use
+
+	Some data was manually created for exact testing:
+		Reservations 00000 to 00009
+		Detail corresponding to reservations mentioned above
+		A customer by the name of Bill Bob for naming ease of use
+		A customer with a cid of 123456789 for ease of use
+		Flights from LAX -> MSP, LAS -> JFK, LAX -> SFO have good testing connections
+		Airlines are named 'Airline001' to 'Airline010' for ease of use
+*/
+
+
 -- Generate the data to represent at least 200 users, 300 reservations, 10 airlines, 30 planes and 100 flights.
 -- (plus 100 prices to match 100 flights and 1-4 legs for each reservation)
 
