@@ -26,7 +26,7 @@ airline_abbreviation varchar(10),
 year_founded int,
 constraint pk_airline primary key(airline_id));
 
--- Not Null: Every plane must have a listed capacity, otherwise its entry has no value
+-- Not Null: Every plane must have a listed capacity, otherwise its entry has no use to the database
 create table PLANE(
 plane_type char(4) not null,
 manufacture varchar(10),
@@ -69,8 +69,9 @@ constraint fk_price foreign key(airline_id) references AIRLINE(airline_id) on de
 constraint ch_price check(high_price >= low_price),
 constraint ch_city_price check(departure_city != arrival_city));
 
--- Not Null: Customers have a first and last name
+-- Not Null: Customers must have a first and last name
 -- Check: Assuming salutation is not null, since it is 'one of three values' (Mr, Mrs, Ms)
+-- Credit Card Expire: Date will be stored as MM/YYYY, which defaults DD to 01, this would be ignored though
 create table CUSTOMER(
 cid varchar(9) not null,
 salutation varchar(3) not null,
@@ -88,7 +89,7 @@ constraint pk_customer primary key(cid),
 constraint ch_salutation check(salutation='Mr' OR salutation='Mrs' OR salutation='Ms'));
 
 -- Not Null: A reservation must have a start city and end city. It must also have ticketed status and reservation date.
--- Customer deletion cascade, if customer is removed, his reservations should be as well
+-- Customer deletion cascade: If customer is removed, his/her reservations should be as well
 create table RESERVATION(
 reservation_number varchar(5) not null,
 cid varchar(9) not null,
@@ -112,6 +113,7 @@ constraint pk_detail primary key(reservation_number, leg),
 constraint fk_detail1 foreign key(reservation_number) references RESERVATION(reservation_number) on delete cascade,
 constraint fk_detail2 foreign key(flight_number) references FLIGHT(flight_number) on delete cascade);
 
+-- Stores our date
 create table OUR_DATE(
 c_date date not null,
 constraint pk_time primary key(c_date));
